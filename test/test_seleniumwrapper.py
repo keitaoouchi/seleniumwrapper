@@ -43,5 +43,10 @@ class TestSeleniumWrapper(unittest.TestCase):
         wrapper = SeleniumWrapper(mocked_driver)
         self.assertEquals(wrapper.wait_and_get('id', 'hoge'), 'hoge')
 
+def suite():
+    suite = unittest.TestSuite()
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
+    return suite
+
 if __name__ == "__main__":
-    unittest.main()
+    suite()
