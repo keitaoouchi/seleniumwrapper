@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["SeleniumWrapper"]
-
 import selenium
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -13,11 +11,6 @@ def _wrappable(obj):
         return False
 
 def _chainreact(__getattr__):
-    """Decorator function used in Chainable's __getattr__ method.
-
-    Chainable object support methods of its wrapped objects, and try to keep
-    its return value also chainable.
-    """
     def containment(*methodname):
         self, methodobj = __getattr__(*methodname)
         def reaction(*realargs):
@@ -36,7 +29,28 @@ class SeleniumWrapper(object):
         if _wrappable(driver):
             self._driver = driver
         else:
-            raise Exception()
+            msg = "2nd argument should be an instance of WebDriver or WebElement. Given %s.".format(type(driver))
+            raise TypeError(msg)
+
+    @classmethod
+    def create(cls, drivername):
+        drivers = {'ie': selenium.webdriver.Ie,
+                   'opera': selenium.webdriver.Opera,
+                   'chrome': selenium.webdriver.Chrome,
+                   'firefox': selenium.webdriver.Firefox}
+        if not isinstance(drivername, str):
+            msg = "drivername should be an instance of string. given %s".format(type(drivername))
+            raise TypeError(msg)
+        dname = drivername.lower()
+        if dname in drivers:
+            try:
+                driver = drivers[dname]()
+                return driver
+            except Exception, e:
+                raise e
+        else:
+            msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given %s".format(drivername)
+            raise ValueError(msg)
 
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)

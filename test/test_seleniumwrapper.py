@@ -10,7 +10,7 @@ from seleniumpytest import SeleniumWrapper
 class TestSeleniumWrapper(unittest.TestCase):
 
     def test_init_raise_if_driver_is_not_a_webdriver_object(self):
-        self.assertRaises(Exception, SeleniumWrapper, ['hoge'])
+        self.assertRaises(TypeError, SeleniumWrapper, 'hoge')
 
     def test_init_not_raise_if_driver_is_a_webdriver_object(self):
         mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
@@ -42,6 +42,13 @@ class TestSeleniumWrapper(unittest.TestCase):
         mocked_driver.find_element_by_id = lambda target: target
         wrapper = SeleniumWrapper(mocked_driver)
         self.assertEquals(wrapper.wait_and_get('id', 'hoge'), 'hoge')
+
+    def test_create_raise_typeerror_if_argument_is_not_a_string(self):
+        self.assertRaises(TypeError, SeleniumWrapper.create, 1)
+
+    def test_create_raise_valueerror_if_argument_is_invalid_drivername(self):
+        self.assertRaises(ValueError, SeleniumWrapper.create, 'Chorome')
+        self.assertRaises(ValueError, SeleniumWrapper.create, 'Firedog')
 
 def suite():
     suite = unittest.TestSuite()
