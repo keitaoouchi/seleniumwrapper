@@ -4,7 +4,6 @@ __all__ = ["SeleniumWrapper"]
 
 import selenium
 from selenium.webdriver.support.ui import WebDriverWait
-import unittest, functools
 
 def _wrappable(obj):
     if (isinstance(obj, selenium.webdriver.remote.webdriver.WebDriver) or
@@ -15,7 +14,7 @@ def _wrappable(obj):
 
 def _chainreact(__getattr__):
     """Decorator function used in Chainable's __getattr__ method.
-    
+
     Chainable object support methods of its wrapped objects, and try to keep
     its return value also chainable.
     """
