@@ -5,7 +5,7 @@ sys.path.append("./../src")
 import unittest
 import selenium
 import mock
-from seleniumwrapper import SeleniumWrapper
+from seleniumpytest import SeleniumWrapper
 
 class TestSeleniumWrapper(unittest.TestCase):
 
