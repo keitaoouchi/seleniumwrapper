@@ -5,7 +5,7 @@ sys.path.append("./../src")
 import unittest
 import selenium
 import mock
-from seleniumpytest import SeleniumWrapper
+from seleniumpytest.wrapper import SeleniumWrapper
 
 class TestSeleniumWrapper(unittest.TestCase):
 
@@ -37,11 +37,11 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertTrue(isinstance(wrapped_element, SeleniumWrapper))
         self.assertFalse(isinstance(unwrapped_element, SeleniumWrapper))
 
-    def test_wrapper_should_respond_to_wait_and_get(self):
+    def test_wrapper_should_respond_to_waitfor(self):
         mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
         mocked_driver.find_element_by_id = lambda target: target
         wrapper = SeleniumWrapper(mocked_driver)
-        self.assertEquals(wrapper.wait_and_get('id', 'hoge'), 'hoge')
+        self.assertEquals(wrapper.waitfor('id', 'hoge'), 'hoge')
 
     def test_create_raise_typeerror_if_argument_is_not_a_string(self):
         self.assertRaises(TypeError, SeleniumWrapper.create, 1)
@@ -50,9 +50,47 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertRaises(ValueError, SeleniumWrapper.create, 'Chorome')
         self.assertRaises(ValueError, SeleniumWrapper.create, 'Firedog')
 
+class TestSeleniumWrappersTanpopoWork(unittest.TestCase):
+
+    def setUp(self):
+        mocky = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
+        mock.find_element_by_id = lambda t: t
+        mock.find_element_by_name = lambda t: t
+        mock.find_element_by_xpath = lambda t: t
+        mock.find_element_by_link_text = lambda t: t
+        mock.find_element_by_partial_link_text = lambda t: t
+        mock.find_element_by_tag_name = lambda t: t
+        mock.find_element_by_class_name = lambda t: t
+        mock.find_element_by_css_selector = lambda t: t
+        # tanpopo work!
+        mock.find_elements_by_id = lambda t: [t]
+        mock.find_elements_by_name = lambda t: [t]
+        mock.find_elements_by_xpath = lambda t: [t]
+        mock.find_elements_by_link_text = lambda t: [t]
+        mock.find_elements_by_partial_link_text = lambda t: [t]
+        mock.find_elements_by_tag_name = lambda t: [t]
+        mock.find_elements_by_class_name = lambda t: [t]
+        mock.find_elements_by_css_selector = lambda t: [t]
+        self.mock = mocky
+
+    def test_waitfor(self):
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertTrue(hasattr(wrapper, 'waitfor'))
+        self.assertEquals(wrapper.waitfor("xpath", "hoge"), "hoge")
+        self.assertEquals(wrapper.waitfor("xpath", "hoge", eager=True), ["hoge"])
+
+    def test_xpath(self):
+        """
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertTrue(hasattr(wrapper, 'xpath'))
+        self.assertEquals(wrapper.xpath("hoge"), "hoge")
+        self.assertEquals(wrapper.xpath("hoge", eager=True), ["hoge"])
+        """
+        pass
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapperTanpopoWork))
     return suite
 
 if __name__ == "__main__":
