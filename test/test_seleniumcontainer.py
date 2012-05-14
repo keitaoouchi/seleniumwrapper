@@ -6,8 +6,7 @@ import unittest
 import collections
 import mock
 import selenium
-from seleniumpytest.container import SeleniumContainerWrapper
-from seleniumpytest.wrapper import SeleniumWrapper
+from seleniumpytest.wrapper import SeleniumWrapper, SeleniumContainerWrapper
 
 class TestSeleniumContainerWrapper(unittest.TestCase):
 

@@ -5,7 +5,8 @@ sys.path.append("./../src")
 import unittest
 import selenium
 import mock
-from seleniumpytest.wrapper import SeleniumWrapper
+from seleniumpytest.wrapper import SeleniumWrapper, SeleniumContainerWrapper
+from selenium.common.exceptions import TimeoutException
 
 class TestSeleniumWrapper(unittest.TestCase):
 
@@ -54,43 +55,58 @@ class TestSeleniumWrappersTanpopoWork(unittest.TestCase):
 
     def setUp(self):
         mocky = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mock.find_element_by_id = lambda t: t
-        mock.find_element_by_name = lambda t: t
-        mock.find_element_by_xpath = lambda t: t
-        mock.find_element_by_link_text = lambda t: t
-        mock.find_element_by_partial_link_text = lambda t: t
-        mock.find_element_by_tag_name = lambda t: t
-        mock.find_element_by_class_name = lambda t: t
-        mock.find_element_by_css_selector = lambda t: t
-        # tanpopo work!
-        mock.find_elements_by_id = lambda t: [t]
-        mock.find_elements_by_name = lambda t: [t]
-        mock.find_elements_by_xpath = lambda t: [t]
-        mock.find_elements_by_link_text = lambda t: [t]
-        mock.find_elements_by_partial_link_text = lambda t: [t]
-        mock.find_elements_by_tag_name = lambda t: [t]
-        mock.find_elements_by_class_name = lambda t: [t]
-        mock.find_elements_by_css_selector = lambda t: [t]
         self.mock = mocky
 
-    def test_waitfor(self):
+    def test_waitfor_raise_if_find_element_return_falsy_value(self):
+        self.mock.find_element_by_xpath.return_value = None
         wrapper = SeleniumWrapper(self.mock)
-        self.assertTrue(hasattr(wrapper, 'waitfor'))
-        self.assertEquals(wrapper.waitfor("xpath", "hoge"), "hoge")
-        self.assertEquals(wrapper.waitfor("xpath", "hoge", eager=True), ["hoge"])
-
-    def test_xpath(self):
-        """
+        self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'timeout':0.1})
+        
+    def test_waitfor_raise_if_find_elements_return_falsy_value(self):
+        self.mock.find_elements_by_xpath.return_value = []
         wrapper = SeleniumWrapper(self.mock)
-        self.assertTrue(hasattr(wrapper, 'xpath'))
-        self.assertEquals(wrapper.xpath("hoge"), "hoge")
-        self.assertEquals(wrapper.xpath("hoge", eager=True), ["hoge"])
-        """
-        pass
+        self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'eager':True, 'timeout':0.1})
+        
+    def test_waitfor_wraps_its_return_value_if_it_is_wrappable(self):
+        mock_elem = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        self.mock.find_element_by_xpath.return_value = mock_elem
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertIsInstance(wrapper.waitfor("xpath", "dummy"), SeleniumWrapper)
+        
+    def test_waitfor_wraps_its_return_value_if_given_eager_arument_is_true(self):
+        mock_elem = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        self.mock.find_elements_by_xpath.return_value = [mock_elem]
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
+        
+    def test_aliases_work_collectly(self):
+        mock_elem = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        self.mock.find_element_by_xpath.return_value = mock_elem
+        self.mock.find_element_by_css_selector.return_value = mock_elem
+        self.mock.find_element_by_tag_name.return_value = mock_elem
+        self.mock.find_element_by_class_name.return_value = mock_elem
+        self.mock.find_element_by_id.return_value = mock_elem
+        self.mock.find_element_by_name.return_value = mock_elem
+        self.mock.find_element_by_link_text.return_value = mock_elem
+        self.mock.find_element_by_partial_link_text.return_value = mock_elem
+        wrapper = SeleniumWrapper(self.mock)
+        
+        self.assertIsInstance(wrapper.xpath("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.css("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.tag("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_class("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_id("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_name("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_linktxt("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_linktxt("dummy", partial=True), SeleniumWrapper)
+        self.assertIsInstance(wrapper.href("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.img(eager=False), SeleniumWrapper)
+        
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTests(unittest.makeSuite(TestSeleniumWrapperTanpopoWork))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrappersTanpopoWork))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
     return suite
 
 if __name__ == "__main__":

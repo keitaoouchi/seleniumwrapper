@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import selenium
+import collections
 from selenium.webdriver.support.ui import WebDriverWait
 
 def _is_wrappable(obj):
@@ -91,7 +92,7 @@ class SeleniumWrapper(object):
             return result
 
     def xpath(self, target, eager=False, timeout=10):
-        return self.waitfor("xpath", timeout, eager, timeout)
+        return self.waitfor("xpath", target, eager, timeout)
 
     def css(self, target, eager=False, timeout=10):
         return self.waitfor("css", target, eager, timeout)
@@ -108,11 +109,11 @@ class SeleniumWrapper(object):
     def by_name(self, target, eager=False, timeout=10):
         return self.waitfor("name", target, eager, timeout)
 
-    def by_linktxt(self, target, eager=False, timeout=10):
-        return self.waitfor("link_text", target, eager, timeout)
-
-    def by_partial_linktxt(self, target, eager=False, timeout=10):
-        return self.waitfor("partial_link_text", target, eager, timeout=10)
+    def by_linktxt(self, target, eager=False, timeout=10, partial=False):
+        if partial:
+            return self.waitfor("partial_link_text", target, eager, timeout=10)
+        else:
+            return self.waitfor("link_text", target, eager, timeout)
 
     def href(self, url, eager=False, timeout=10):
         return self.xpath("//a[@href='%s']".format(url), eager, timeout)
@@ -121,3 +122,35 @@ class SeleniumWrapper(object):
         if ext:
             return self.xpath("//img[@contains(@src, '%s']".format(ext), eager, timeout)
         return self.xpath("//img", eager, timeout)
+    
+class SeleniumContainerWrapper(object):
+
+    def __init__(self, iterable):
+        if not isinstance(iterable, collections.Sequence):
+            msg = "2nd argument should be an instance of collections.Sequence. given %s".format(type(iterable))
+            raise TypeError(msg)
+        self._iterable = iterable
+
+    @classmethod
+    def wrap(cls, iterable):
+        try:
+            return SeleniumContainerWrapper(iterable)
+        except TypeError, e:
+            raise e
+
+    @_chainreact
+    def __getattr__(self, name):
+        """Wrap return value using '_chanreact'."""
+        return self._iterable, getattr(self._iterable, name)
+
+    def __getitem__(self, key):
+        obj = self._iterable[key]
+        if _is_wrappable(obj):
+            return SeleniumWrapper(obj)
+        return obj
+
+    def __len__(self):
+        return len(self._iterable)
+
+    def __contains__(self, key):
+        return key in self._iterable
