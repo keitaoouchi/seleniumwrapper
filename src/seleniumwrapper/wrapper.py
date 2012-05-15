@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import collections
+import inspect
 from selenium.webdriver import Ie, Opera, Chrome, Firefox
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import Select
 
 def create(drivername):
     if not isinstance(drivername, str):
@@ -32,15 +34,21 @@ def _is_wrappable(obj):
 
 def _chainreact(__getattr__):
     def containment(*methodname):
-        self, methodobj = __getattr__(*methodname)
-        def reaction(*realargs):
-            result = methodobj(*realargs)
-            result = result if result else self
-            if _is_wrappable(result):
-                return SeleniumWrapper(result)
+        def wrap_or_else(obj):
+            if _is_wrappable(obj):
+                return SeleniumWrapper(obj)
             else:
-                return result
-        return reaction
+                return obj
+        self, methodobj = __getattr__(*methodname)
+        if inspect.isroutine(methodobj):
+            def reaction(*realargs):
+                result = methodobj(*realargs)
+                # for side-effective method(append, ...)
+                result = result if result else self
+                return wrap_or_else(result)
+            return reaction
+        else:
+            return wrap_or_else(methodobj)
     return containment
 
 class SeleniumWrapper(object):
@@ -62,6 +70,9 @@ class SeleniumWrapper(object):
     @_chainreact
     def __getattr__(self, name):
         return self._driver, getattr(self._driver, name)
+
+    def _is_selectable(self):
+        return self.unwrap.tag_name == u'select'
 
     def waitfor(self, type, target, eager=False, timeout=10):
         if eager:
@@ -124,6 +135,12 @@ class SeleniumWrapper(object):
         if ext:
             return self.xpath("//img[contains(@src, '{0}')]".format(ext), eager, timeout)
         return self.xpath("//img", eager, timeout)
+
+    @property
+    def select(self):
+        if self._is_selectable():
+            return Select(self.unwrap)
+        return None
 
 class SeleniumContainerWrapper(object):
 
