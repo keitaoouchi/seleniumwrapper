@@ -115,8 +115,10 @@ class SeleniumWrapper(object):
         else:
             return self.waitfor("link_text", target, eager, timeout)
 
-    def href(self, url, eager=False, timeout=10):
-        return self.xpath("//a[@href='%s']".format(url), eager, timeout)
+    def href(self, partialurl=None, eager=False, timeout=10):
+        if partialurl:
+            return self.xpath("//a[@contains(@href, '%s']".format(partialurl), eager, timeout)
+        return self.xpath("//a", eager, timeout)
 
     def img(self, eager=True, ext=None, timeout=10):
         if ext:
