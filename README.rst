@@ -1,6 +1,6 @@
 About this module
 -----------------
-selenium webdriver wrapper to make manipulation easier. 
+selenium webdriver wrapper to make manipulation easier.
 
 How to install
 --------------
@@ -16,25 +16,36 @@ or use easy_install::
 also you need selenium::
 
     $ pip install selenium
-    
-Example to use::
-----------------
+
+Example to use
+--------------
+
+create function helps you to init webdriver and wrap it easily::
 
     >>> import seleniumwrapper as selwrap
     >>> br = selwrap.create("chrome")
-    # SeleniumWrapper delegate to its wrapped webdriver.
+
+SeleniumWrapper delegate to its wrapped webdriver::
+
     >>> br.get("http://www.example.com")
     <seleniumwrapper.wrapper.SeleniumWrapper object at 0x...>
     >>> br.xpath("//div[@class='main'])
     <seleniumwrapper.wrapper.SeleniumWrapper object at 0x...>
-    # set eager=True => find_elements_by
+
+Setting eager=True to invoke find_elements::
+
     >>> br.xpath("//a", eager=True)
     <seleniumwrapper.wrapper.SeleniumContainerWrapper object at 0x...>
-    # SeleniumContainerWrapper also delegate to its wrapped container.
+
+SeleniumContainerWrapper also delegate to its wrapped container::
+
     >>> links = [i.get_attribute("href") for i in br.xpath("//a", eager=True)]
-    # each content in SeleniumContainerWrapper also SeleniumWrapper.
+
+Each contents in SeleniumContainerWrapper also SeleniumWrapper::
+
     >>> tds = [tr.xpath("//td", eager=True) for tr in br.xpath("//tr", eager=True)]
-    
+
+
 Basic API
 ---------
 * seleniumwrapper.create(drivername)
@@ -63,4 +74,6 @@ SeleniumWrapper
 * href(partialurl=None, eager=False, timeout=10):
     find_element_by_xpath("//a", timeout). if partialurl was given, search 'a' tag which href contains partialurl.
 * img(eager=True, ext=None, timeout=10)
-    find_elements_by_xpath("//img", timeout). 
+    find_elements_by_xpath("//img", timeout).
+* select
+    Return Select(self.unwrap) if possible, else return None.
