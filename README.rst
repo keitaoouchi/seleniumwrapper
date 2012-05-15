@@ -60,7 +60,7 @@ SeleniumWrapper
     find_element_by_name(target, timeout)
 * by_linktxt(target, eager=False, timeout=10, partial=False)
     find_element_by_link_text(target, timeout). if partial=True, then find_element_by_partial_link_text
-* href(url, eager=False, timeout=10):
-    find_element_by_xpath("//a[@href='%s']".format(url), timeout)
+* href(partialurl=None, eager=False, timeout=10):
+    find_element_by_xpath("//a", timeout). if partialurl was given, search 'a' tag which href contains partialurl.
 * img(eager=True, ext=None, timeout=10)
     find_elements_by_xpath("//img", timeout). 
