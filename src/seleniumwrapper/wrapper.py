@@ -122,7 +122,7 @@ class SeleniumWrapper(object):
 
     def img(self, eager=True, ext=None, timeout=10):
         if ext:
-            return self.xpath("//img[contains(@src, '{0})']".format(ext), eager, timeout)
+            return self.xpath("//img[contains(@src, '{0}')]".format(ext), eager, timeout)
         return self.xpath("//img", eager, timeout)
 
 class SeleniumContainerWrapper(object):
