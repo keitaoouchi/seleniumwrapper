@@ -3,7 +3,6 @@ import sys
 sys.path.append("./../src")
 
 import unittest
-import selenium
 import mock
 import seleniumwrapper
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -55,6 +54,22 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertRaises(ValueError, seleniumwrapper.create, 'Chorome')
         self.assertRaises(ValueError, seleniumwrapper.create, 'Firedog')
 
+    def test_wrapper_should_handle_attr_access_even_if_attr_is_descriptor(self):
+        mocked_element = mock.Mock(WebElement)
+        class Hoge(WebDriver):
+            def __init__(self):
+                pass
+            @property
+            def hoge(self):
+                return mocked_element
+            @property
+            def num(self):
+                return 100
+        mocked_driver = Hoge()
+        wrapper = SeleniumWrapper(mocked_driver)
+        self.assertEquals(wrapper.num, 100)
+        self.assertTrue(isinstance(wrapper.hoge, SeleniumWrapper), wrapper.hoge)
+
 class TestSeleniumWrapperAliases(unittest.TestCase):
 
     def setUp(self):
@@ -65,24 +80,24 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.mock.find_element_by_xpath.return_value = None
         wrapper = SeleniumWrapper(self.mock)
         self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'timeout':0.1})
-        
+
     def test_waitfor_raise_if_find_elements_return_falsy_value(self):
         self.mock.find_elements_by_xpath.return_value = []
         wrapper = SeleniumWrapper(self.mock)
         self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'eager':True, 'timeout':0.1})
-        
+
     def test_waitfor_wraps_its_return_value_if_it_is_wrappable(self):
         mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy"), SeleniumWrapper)
-        
+
     def test_waitfor_wraps_its_return_value_if_given_eager_arument_is_true(self):
         mock_elem = mock.Mock(WebElement)
         self.mock.find_elements_by_xpath.return_value = [mock_elem]
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
-        
+
     def test_aliases_work_collectly(self):
         mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
@@ -94,7 +109,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.mock.find_element_by_link_text.return_value = mock_elem
         self.mock.find_element_by_partial_link_text.return_value = mock_elem
         wrapper = SeleniumWrapper(self.mock)
-        
+
         self.assertIsInstance(wrapper.xpath("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.css("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.tag("dummy"), SeleniumWrapper)
@@ -105,7 +120,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.assertIsInstance(wrapper.by_linktxt("dummy", partial=True), SeleniumWrapper)
         self.assertIsInstance(wrapper.href("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.img(eager=False), SeleniumWrapper)
-        
+
 
 def suite():
     suite = unittest.TestSuite()
