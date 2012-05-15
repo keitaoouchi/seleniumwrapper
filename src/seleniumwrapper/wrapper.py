@@ -117,12 +117,12 @@ class SeleniumWrapper(object):
 
     def href(self, partialurl=None, eager=False, timeout=10):
         if partialurl:
-            return self.xpath("//a[@contains(@href, '{0}')]".format(partialurl), eager, timeout)
+            return self.xpath("//a[contains(@href, '{0}')]".format(partialurl), eager, timeout)
         return self.xpath("//a", eager, timeout)
 
     def img(self, eager=True, ext=None, timeout=10):
         if ext:
-            return self.xpath("//img[@contains(@src, '{0}']".format(ext), eager, timeout)
+            return self.xpath("//img[contains(@src, '{0})']".format(ext), eager, timeout)
         return self.xpath("//img", eager, timeout)
 
 class SeleniumContainerWrapper(object):
