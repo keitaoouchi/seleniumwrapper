@@ -38,6 +38,6 @@ setup(
     test_suite = "test_seleniumwrapper.suite",
     license='BSD License',
     classifiers=classifiers,
-    description = 'Selenium wrapper for python unittest.',
+    description = 'selenium webdriver wrapper to make manipulation easier.',
     long_description=long_description,
 )
