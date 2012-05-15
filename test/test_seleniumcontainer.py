@@ -6,7 +6,9 @@ import unittest
 import collections
 import mock
 import selenium
-from seleniumpytest.wrapper import SeleniumWrapper, SeleniumContainerWrapper
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from seleniumwrapper.wrapper import SeleniumWrapper, SeleniumContainerWrapper
 
 class TestSeleniumContainerWrapper(unittest.TestCase):
 
@@ -14,13 +16,11 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         containment = 1
         self.assertNotIsInstance(containment, collections.Sequence)
         self.assertRaises(TypeError, SeleniumContainerWrapper, containment)
-        self.assertRaises(TypeError, SeleniumContainerWrapper.wrap, containment)
 
     def test_container_holds_given_argument_if_it_is_an_instance_of_Sequence(self):
         containment = []
         self.assertIsInstance(containment, collections.Sequence)
         SeleniumContainerWrapper(containment)
-        SeleniumContainerWrapper.wrap(containment)
 
     def test_container_should_delegate_unknown_attribute_access_to_wrapped_container(self):
         container = SeleniumContainerWrapper([])
@@ -31,8 +31,8 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         self.assertEquals(container.count(1), 1)
 
     def test_container_should_return_wrapped_object_if_possible(self):
-        mock1 = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mock2 = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock1 = mock.Mock(WebDriver)
+        mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2]
         container = SeleniumContainerWrapper(iterable)
         wrapped1 = container.pop()
@@ -43,8 +43,8 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         self.assertTrue(hasattr(wrapped2, 'waitfor'))
 
     def test_container_should_support_indexing_and_also_wrap_if_possible(self):
-        mock1 = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mock2 = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock1 = mock.Mock(WebDriver)
+        mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2, 1]
         container = SeleniumContainerWrapper(iterable)
         self.assertIsInstance(container[0], SeleniumWrapper)
@@ -52,23 +52,23 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         self.assertIsInstance(container[2], int)
 
     def test_container_support_for_statement(self):
-        mock1 = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mock2 = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock1 = mock.Mock(WebDriver)
+        mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2]
         container = SeleniumContainerWrapper(iterable)
         for m in container:
             self.assertIsInstance(m, SeleniumWrapper)
 
     def test_container_has_length(self):
-        mock1 = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mock2 = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock1 = mock.Mock(WebDriver)
+        mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2]
         container = SeleniumContainerWrapper(iterable)
         self.assertEquals(len(container), 2)
 
     def test_container_support__contains__protocol(self):
-        mock1 = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mock2 = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock1 = mock.Mock(WebDriver)
+        mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2]
         container = SeleniumContainerWrapper(iterable)
         self.assertTrue(mock1 in container)

@@ -1,12 +1,31 @@
 # -*- coding: utf-8 -*-
 
-import selenium
 import collections
+from selenium.webdriver import Ie, Opera, Chrome, Firefox
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 
+def create(drivername):
+    if not isinstance(drivername, str):
+        msg = "drivername should be an instance of string. given %s".format(type(drivername))
+        raise TypeError(msg)
+    drivers = {'ie': Ie,
+               'opera': Opera,
+               'chrome': Chrome,
+               'firefox': Firefox}
+    dname = drivername.lower()
+    if dname in drivers:
+        try:
+            return SeleniumWrapper(drivers[dname]())
+        except Exception, e:
+            raise e
+    else:
+        msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given %s".format(drivername)
+        raise ValueError(msg)
+
 def _is_wrappable(obj):
-    if (isinstance(obj, selenium.webdriver.remote.webdriver.WebDriver) or
-        isinstance(obj, selenium.webdriver.remote.webelement.WebElement)):
+    if isinstance(obj, WebDriver) or isinstance(obj, WebElement):
         return True
     else:
         return False
@@ -36,25 +55,6 @@ class SeleniumWrapper(object):
     @property
     def unwrap(self):
         return self._driver
-
-    @classmethod
-    def create(cls, drivername):
-        drivers = {'ie': selenium.webdriver.Ie,
-                   'opera': selenium.webdriver.Opera,
-                   'chrome': selenium.webdriver.Chrome,
-                   'firefox': selenium.webdriver.Firefox}
-        if not isinstance(drivername, str):
-            msg = "drivername should be an instance of string. given %s".format(type(drivername))
-            raise TypeError(msg)
-        dname = drivername.lower()
-        if dname in drivers:
-            try:
-                return SeleniumWrapper(drivers[dname]())
-            except Exception, e:
-                raise e
-        else:
-            msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given %s".format(drivername)
-            raise ValueError(msg)
 
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)
@@ -122,7 +122,7 @@ class SeleniumWrapper(object):
         if ext:
             return self.xpath("//img[@contains(@src, '%s']".format(ext), eager, timeout)
         return self.xpath("//img", eager, timeout)
-    
+
 class SeleniumContainerWrapper(object):
 
     def __init__(self, iterable):
@@ -130,13 +130,6 @@ class SeleniumContainerWrapper(object):
             msg = "2nd argument should be an instance of collections.Sequence. given %s".format(type(iterable))
             raise TypeError(msg)
         self._iterable = iterable
-
-    @classmethod
-    def wrap(cls, iterable):
-        try:
-            return SeleniumContainerWrapper(iterable)
-        except TypeError, e:
-            raise e
 
     @_chainreact
     def __getattr__(self, name):

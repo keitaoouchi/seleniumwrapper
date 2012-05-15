@@ -5,7 +5,11 @@ sys.path.append("./../src")
 import unittest
 import selenium
 import mock
-from seleniumpytest.wrapper import SeleniumWrapper, SeleniumContainerWrapper
+import seleniumwrapper
+from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.remote.webelement import WebElement
+from seleniumwrapper.wrapper import SeleniumWrapper
+from seleniumwrapper.wrapper import SeleniumContainerWrapper
 from selenium.common.exceptions import TimeoutException
 
 class TestSeleniumWrapper(unittest.TestCase):
@@ -14,23 +18,23 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertRaises(TypeError, SeleniumWrapper, 'hoge')
 
     def test_init_not_raise_if_driver_is_a_webdriver_object(self):
-        mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
+        mocked_driver = mock.Mock(WebDriver)
         SeleniumWrapper(mocked_driver)
 
     def test_wrapper_should_delegate_unknown_attribute_access_to_wrapped_driver(self):
-        mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
+        mocked_driver = mock.Mock(WebDriver)
         mocked_driver.hoge = lambda d: d
         wrapper = SeleniumWrapper(mocked_driver)
         self.assertEquals(wrapper.hoge(1), 1)
 
     def test_wrapper_should_raise_AttributeError_if_wrapped_driver_also_dont_have_attribute_with_given_name(self):
-        mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
+        mocked_driver = mock.Mock(WebDriver)
         wrapper = SeleniumWrapper(mocked_driver)
         self.assertRaises(AttributeError, getattr, *[wrapper, 'hoge'])
 
     def test_wrapper_should_chain_wrapping_if_possible(self):
-        mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
-        mocked_element = mock.Mock(selenium.webdriver.remote.webelement.WebElement)
+        mocked_driver = mock.Mock(WebDriver)
+        mocked_element = mock.Mock(WebElement)
         mocked_driver.find_element_by_id = lambda given: given
         wrapper = SeleniumWrapper(mocked_driver)
         wrapped_element = wrapper.find_element_by_id(mocked_element)
@@ -39,22 +43,22 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertFalse(isinstance(unwrapped_element, SeleniumWrapper))
 
     def test_wrapper_should_respond_to_waitfor(self):
-        mocked_driver = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
+        mocked_driver = mock.Mock(WebDriver)
         mocked_driver.find_element_by_id = lambda target: target
         wrapper = SeleniumWrapper(mocked_driver)
         self.assertEquals(wrapper.waitfor('id', 'hoge'), 'hoge')
 
     def test_create_raise_typeerror_if_argument_is_not_a_string(self):
-        self.assertRaises(TypeError, SeleniumWrapper.create, 1)
+        self.assertRaises(TypeError, seleniumwrapper.create, 1)
 
     def test_create_raise_valueerror_if_argument_is_invalid_drivername(self):
-        self.assertRaises(ValueError, SeleniumWrapper.create, 'Chorome')
-        self.assertRaises(ValueError, SeleniumWrapper.create, 'Firedog')
+        self.assertRaises(ValueError, seleniumwrapper.create, 'Chorome')
+        self.assertRaises(ValueError, seleniumwrapper.create, 'Firedog')
 
-class TestSeleniumWrappersTanpopoWork(unittest.TestCase):
+class TestSeleniumWrapperAliases(unittest.TestCase):
 
     def setUp(self):
-        mocky = mock.Mock(selenium.webdriver.remote.webdriver.WebDriver)
+        mocky = mock.Mock(WebDriver)
         self.mock = mocky
 
     def test_waitfor_raise_if_find_element_return_falsy_value(self):
@@ -68,19 +72,19 @@ class TestSeleniumWrappersTanpopoWork(unittest.TestCase):
         self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'eager':True, 'timeout':0.1})
         
     def test_waitfor_wraps_its_return_value_if_it_is_wrappable(self):
-        mock_elem = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy"), SeleniumWrapper)
         
     def test_waitfor_wraps_its_return_value_if_given_eager_arument_is_true(self):
-        mock_elem = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock_elem = mock.Mock(WebElement)
         self.mock.find_elements_by_xpath.return_value = [mock_elem]
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
         
     def test_aliases_work_collectly(self):
-        mock_elem = mock.Mock(selenium.webdriver.remote.webdriver.WebElement)
+        mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
         self.mock.find_element_by_css_selector.return_value = mock_elem
         self.mock.find_element_by_tag_name.return_value = mock_elem
@@ -105,7 +109,7 @@ class TestSeleniumWrappersTanpopoWork(unittest.TestCase):
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTests(unittest.makeSuite(TestSeleniumWrappersTanpopoWork))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapperAliases))
     suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
     return suite
 
