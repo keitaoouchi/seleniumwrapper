@@ -30,7 +30,7 @@ classifiers = [
 setup(
     author='Keita Oouchi',
     author_email='keita.oouchi@gmail.com',
-    url = 'https://github.com/ghostreet/seleniumpytest',
+    url = 'https://github.com/keitaoouchi/seleniumwrapper',
     name = 'seleniumwrapper',
     version = '0.1.0',
     package_dir={"":"src"},
@@ -38,6 +38,6 @@ setup(
     test_suite = "test_seleniumwrapper.suite",
     license='BSD License',
     classifiers=classifiers,
-    description = 'Selenium wrapper for python unittest.',
+    description = 'selenium webdriver wrapper to make manipulation easier.',
     long_description=long_description,
 )
