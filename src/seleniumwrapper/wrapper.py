@@ -118,7 +118,7 @@ class SeleniumWrapper(object):
     def tag(self, target, eager=False, timeout=3):
         return self.waitfor("tag", target, eager, timeout)
 
-    def tagtext(self, tag, text, partial=False, eager=False, timeout=3):
+    def by_text(self, text, tag="*", partial=False, eager=False, timeout=3):
         if partial:
             return self.xpath(".//{tag}[contains(text(), '{text}')]".format(tag=tag, text=text), eager, timeout)
         return self.xpath(".//{tag}[text()='{text}']".format(tag=tag, text=text), eager, timeout)
