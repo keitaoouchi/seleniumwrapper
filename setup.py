@@ -32,7 +32,7 @@ setup(
     author_email='keita.oouchi@gmail.com',
     url = 'https://github.com/keitaoouchi/seleniumwrapper',
     name = 'seleniumwrapper',
-    version = '0.1.4',
+    version = '0.1.5',
     package_dir={"":"src"},
     packages = ['seleniumwrapper'],
     test_suite = "test_seleniumwrapper.suite",
