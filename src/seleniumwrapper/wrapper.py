@@ -74,7 +74,7 @@ class SeleniumWrapper(object):
     def _is_selectable(self):
         return self.unwrap.tag_name == u'select'
 
-    def waitfor(self, type, target, eager=False, timeout=10):
+    def waitfor(self, type, target, eager=False, timeout=3):
         if eager:
             types = {"id":lambda d: d.find_elements_by_id(target),
                      "name":lambda d: d.find_elements_by_name(target),
@@ -102,39 +102,51 @@ class SeleniumWrapper(object):
         else:
             return result
 
-    def xpath(self, target, eager=False, timeout=10):
+    def click(self, timeout=2):
+        if isinstance(self._driver, WebElement):
+            WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
+            self._driver.click()
+            return True
+        return False
+
+    def xpath(self, target, eager=False, timeout=3):
         return self.waitfor("xpath", target, eager, timeout)
 
-    def css(self, target, eager=False, timeout=10):
+    def css(self, target, eager=False, timeout=3):
         return self.waitfor("css", target, eager, timeout)
 
-    def tag(self, target, eager=False, timeout=10):
+    def tag(self, target, eager=False, timeout=3):
         return self.waitfor("tag", target, eager, timeout)
 
-    def by_class(self, target, eager=False, timeout=10):
+    def tagtext(self, tag, text, partial=False, eager=False, timeout=3):
+        if partial:
+            return self.xpath(".//{tag}[contains(text(), '{text}')]".format(tag=tag, text=text), eager, timeout)
+        return self.xpath(".//{tag}[text()='{text}']".format(tag=tag, text=text), eager, timeout)
+
+    def by_class(self, target, eager=False, timeout=3):
         return self.waitfor("class", target, eager, timeout)
 
-    def by_id(self, target, eager=False, timeout=10):
+    def by_id(self, target, eager=False, timeout=3):
         return self.waitfor("id", target, eager, timeout)
 
-    def by_name(self, target, eager=False, timeout=10):
+    def by_name(self, target, eager=False, timeout=3):
         return self.waitfor("name", target, eager, timeout)
 
-    def by_linktxt(self, target, eager=False, timeout=10, partial=False):
+    def by_linktxt(self, target, eager=False, timeout=3, partial=False):
         if partial:
-            return self.waitfor("partial_link_text", target, eager, timeout=10)
+            return self.waitfor("partial_link_text", target, eager, timeout=3)
         else:
             return self.waitfor("link_text", target, eager, timeout)
 
-    def href(self, partialurl=None, eager=False, timeout=10):
+    def href(self, partialurl=None, eager=False, timeout=3):
         if partialurl:
-            return self.xpath("//a[contains(@href, '{0}')]".format(partialurl), eager, timeout)
-        return self.xpath("//a", eager, timeout)
+            return self.xpath(".//a[contains(@href, '{0}')]".format(partialurl), eager, timeout)
+        return self.xpath(".//a", eager, timeout)
 
-    def img(self, eager=True, ext=None, timeout=10):
+    def img(self, eager=True, ext=None, timeout=3):
         if ext:
-            return self.xpath("//img[contains(@src, '{0}')]".format(ext), eager, timeout)
-        return self.xpath("//img", eager, timeout)
+            return self.xpath(".//img[contains(@src, '{0}')]".format(ext), eager, timeout)
+        return self.xpath(".//img", eager, timeout)
 
     @property
     def select(self):
