@@ -62,7 +62,7 @@ SeleniumWrapper
     find_element_by_css_selector(target, timeout)
 * tag(target, eager=False, timeout=10)
     find_element_by_tag_name(target, timeout)
-* tagtext(tag, text, partial=False, eager=False, timeout=3)
+* by_text(text, tag='*', partial=False, eager=False, timeout=3)
     similar to find_element_by_link_text or find_element_by_partial_link_text, but this method can be applicable to any tag.
 * by_class(target, eager=False, timeout=10)
     find_element_by_class_name(target, timeout)
