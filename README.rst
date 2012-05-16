@@ -20,7 +20,7 @@ also you need selenium::
 Example to use
 --------------
 
-create function helps you to init webdriver and wrap it easily::
+*create* function helps you to init webdriver and wrap it easily::
 
     >>> import seleniumwrapper as selwrap
     >>> br = selwrap.create("chrome")
@@ -32,7 +32,7 @@ SeleniumWrapper delegate to its wrapped webdriver::
     >>> br.xpath("//div[@class='main'])
     <seleniumwrapper.wrapper.SeleniumWrapper object at 0x...>
 
-Setting eager=True to invoke find_elements::
+Setting *eager=True* to invoke find_elements::
 
     >>> br.xpath("//a", eager=True)
     <seleniumwrapper.wrapper.SeleniumContainerWrapper object at 0x...>
@@ -44,7 +44,6 @@ SeleniumContainerWrapper also delegate to its wrapped container::
 Each contents in SeleniumContainerWrapper also SeleniumWrapper::
 
     >>> tds = [tr.xpath("//td", eager=True) for tr in br.xpath("//tr", eager=True)]
-
 
 Basic API
 ---------
@@ -63,6 +62,8 @@ SeleniumWrapper
     find_element_by_css_selector(target, timeout)
 * tag(target, eager=False, timeout=10)
     find_element_by_tag_name(target, timeout)
+* tagtext(tag, text, partial=False, eager=False, timeout=3)
+    similar to find_element_by_link_text or find_element_by_partial_link_text, but this method can be applicable to any tag.
 * by_class(target, eager=False, timeout=10)
     find_element_by_class_name(target, timeout)
 * by_id(target, eager=False, timeout=10)
