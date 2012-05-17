@@ -22,7 +22,7 @@ def create(drivername):
     if dname in drivers:
         try:
             return SeleniumWrapper(drivers[dname]())
-        except Exception, e:
+        except Exception as e:
             raise e
     else:
         msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given {0}".format(drivername)
@@ -81,7 +81,7 @@ class SeleniumWrapper(object):
         return self._driver, getattr(self._driver, name)
 
     def _is_selectable(self):
-        return self.unwrap.tag_name == u'select'
+        return self.unwrap.tag_name == 'select'
 
     def _polling(self, element, func, timeout):
         err_messages = []
@@ -90,7 +90,7 @@ class SeleniumWrapper(object):
             try:
                 func(element)
                 return []
-            except WebDriverException, e:
+            except WebDriverException as e:
                 err_messages.append(e.message)
             time.sleep(0.02)
             if (time.time() > endtime):
@@ -115,7 +115,7 @@ class SeleniumWrapper(object):
                             "but {target} was not displayed.")
                 msg = "".join(template).format(sec=timeout, target=str(self._driver))
                 raise NoSuchElementException(msg)
-            except WebDriverException, e:
+            except WebDriverException as e:
                 raise e
 
     def waitfor(self, type, target, eager=False, timeout=3):

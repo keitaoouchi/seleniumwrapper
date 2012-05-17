@@ -4,7 +4,7 @@ selenium webdriver wrapper to make manipulation easier.
 
 How to install
 --------------
-Requires python2.6 or later (include python3.x).
+Requires python2.6 or later (exclude python3.x).
 You need *pip* or *distribute* or *setuptools*::
 
     $ pip install seleniumwrapper
