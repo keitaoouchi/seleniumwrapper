@@ -9,7 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwrapper.wrapper import SeleniumWrapper
 from seleniumwrapper.wrapper import SeleniumContainerWrapper
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
 
 class TestSeleniumWrapper(unittest.TestCase):
 
@@ -70,6 +70,14 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertEquals(wrapper.num, 100)
         self.assertTrue(isinstance(wrapper.hoge, SeleniumWrapper), wrapper.hoge)
 
+    def test_click_should_raise_if_element_is_not_clickable_for_timeout_seconds(self):
+        def dummy():
+            raise WebDriverException("hoge:fuga:huhuhu")
+        mocked_element = mock.Mock(WebElement)
+        mocked_element.click = dummy
+        wrapper = SeleniumWrapper(mocked_element)
+        self.assertRaises(WebDriverException, wrapper.click)
+
 class TestSeleniumWrapperAliases(unittest.TestCase):
 
     def setUp(self):
@@ -79,12 +87,12 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
     def test_waitfor_raise_if_find_element_return_falsy_value(self):
         self.mock.find_element_by_xpath.return_value = None
         wrapper = SeleniumWrapper(self.mock)
-        self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'timeout':0.1})
+        self.assertRaises(NoSuchElementException, wrapper.waitfor, *['xpath', 'dummy'], **{'timeout':0.1})
 
     def test_waitfor_raise_if_find_elements_return_falsy_value(self):
         self.mock.find_elements_by_xpath.return_value = []
         wrapper = SeleniumWrapper(self.mock)
-        self.assertRaises(TimeoutException, wrapper.waitfor, *['xpath', 'dummy'], **{'eager':True, 'timeout':0.1})
+        self.assertRaises(NoSuchElementException, wrapper.waitfor, *['xpath', 'dummy'], **{'eager':True, 'timeout':0.1})
 
     def test_waitfor_wraps_its_return_value_if_it_is_wrappable(self):
         mock_elem = mock.Mock(WebElement)
