@@ -96,9 +96,11 @@ class SeleniumWrapper(object):
             if (time.time() > endtime):
                 return err_messages
 
-    def click(self, timeout=3):
+    def click(self, timeout=3, presleep=0, postsleep=0):
         if isinstance(self._driver, WebElement):
             try:
+                if presleep:
+                    time.sleep(presleep)
                 WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
                 error_messages = self._polling(self._driver, lambda d: d.click(), timeout)
                 if error_messages:
@@ -106,6 +108,8 @@ class SeleniumWrapper(object):
                                 "but clicked other elements.")
                     msg = "".join(template).format(sec=timeout)
                     raise WebDriverException(msg)
+                if postsleep:
+                    time.sleep(postsleep)
             except TimeoutException:
                 template = ("Wait for elemtent to be displayed for {sec} seconds, ",
                             "but {target} was not displayed.")
