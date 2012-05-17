@@ -54,27 +54,29 @@ SeleniumWrapper
 ^^^^^^^^^^^^^^^
 * unwrap
     Retrieves WebDriver or WebElement from wrapped object.
-* waitfor(type, target, eager=False, timeout=10)
+* click(timeout=3)
+    Continue to polling until timeout or element is displayed and clickable.
+* waitfor(type, target, eager=False, timeout=3)
     See source.
-* xpath(target, eager=False, timeout=10)
+* xpath(target, eager=False, timeout=3)
     find_element_by_xpath(target, timeout)
-* css(target, eager=False, timeout=10)
+* css(target, eager=False, timeout=3)
     find_element_by_css_selector(target, timeout)
-* tag(target, eager=False, timeout=10)
+* tag(target, eager=False, timeout=3)
     find_element_by_tag_name(target, timeout)
 * by_text(text, tag='*', partial=False, eager=False, timeout=3)
     similar to find_element_by_link_text or find_element_by_partial_link_text, but this method can be applicable to any tag.
-* by_class(target, eager=False, timeout=10)
+* by_class(target, eager=False, timeout=3)
     find_element_by_class_name(target, timeout)
-* by_id(target, eager=False, timeout=10)
+* by_id(target, eager=False, timeout=3)
     find_element_by_id(target, timeout)
-* by_name(target, eager=False, timeout=10)
+* by_name(target, eager=False, timeout=3)
     find_element_by_name(target, timeout)
-* by_linktxt(target, eager=False, timeout=10, partial=False)
+* by_linktxt(target, eager=False, timeout=3, partial=False)
     find_element_by_link_text(target, timeout). if partial=True, then find_element_by_partial_link_text
-* href(partialurl=None, eager=False, timeout=10):
+* href(partialurl=None, eager=False, timeout=3):
     find_element_by_xpath("//a", timeout). if partialurl was given, search 'a' tag which href contains partialurl.
-* img(eager=True, ext=None, timeout=10)
+* img(eager=True, ext=None, timeout=3)
     find_elements_by_xpath("//img", timeout).
 * select
     Return Select(self.unwrap) if possible, else return None.
