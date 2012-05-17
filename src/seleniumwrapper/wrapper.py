@@ -66,6 +66,13 @@ class SeleniumWrapper(object):
     def unwrap(self):
         return self._driver
 
+    @property
+    def parent(self):
+        if isinstance(self._driver, WebElement):
+            return self.xpath("./parent::node()", timeout=2)
+        else:
+            raise AttributeError("'WebDriver' object has no attribute 'parent'")
+
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)
 
