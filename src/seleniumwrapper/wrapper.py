@@ -89,6 +89,24 @@ class SeleniumWrapper(object):
             if (time.time() > endtime):
                 return err_messages
 
+    def click(self, timeout=3):
+        if isinstance(self._driver, WebElement):
+            try:
+                WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
+                error_messages = self._polling(self._driver, lambda d: d.click(), timeout)
+                if error_messages:
+                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
+                                "but clicked other elements.")
+                    msg = "".join(template).format(sec=timeout)
+                    raise WebDriverException(msg)
+            except TimeoutException:
+                template = ("Wait for elemtent to be displayed for {sec} seconds, ",
+                            "but {target} was not displayed.")
+                msg = "".join(template).format(sec=timeout, target=str(self._driver))
+                raise NoSuchElementException(msg)
+            except WebDriverException, e:
+                raise e
+
     def waitfor(self, type, target, eager=False, timeout=3):
         if eager:
             types = {"id":lambda d: d.find_elements_by_id(target),
@@ -122,24 +140,6 @@ class SeleniumWrapper(object):
                         "but {type}:{target} didn't appear.")
             msg = "".join(template).format(sec=timeout, type=type, target=target)
             raise NoSuchElementException(msg)
-
-    def click(self, timeout=2):
-        if isinstance(self._driver, WebElement):
-            try:
-                WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
-                error_messages = self._polling(self._driver, lambda d: d.click(), timeout)
-                if error_messages:
-                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
-                                "but clicked other elements.")
-                    msg = "".join(template).format(sec=timeout, fail_clicked=str(fail_clicked))
-                    raise WebDriverException(msg)
-            except TimeoutException:
-                template = ("Wait for elemtent to be displayed for {sec} seconds, ",
-                            "but {target} was not displayed.")
-                msg = "".join(template).format(sec=timeout, target=str(self._driver))
-                raise NoSuchElementException(msg)
-            except WebDriverException, e:
-                raise e
 
     def xpath(self, target, eager=False, timeout=3):
         return self.waitfor("xpath", target, eager, timeout)
