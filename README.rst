@@ -56,7 +56,7 @@ SeleniumWrapper
     Retrieves WebDriver or WebElement from wrapped object.
 * parent
     find_element_by_xpath("./parent::node()")
-* click(timeout=3)
+* click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable.
 * waitfor(type, target, eager=False, timeout=3)
     See source.
