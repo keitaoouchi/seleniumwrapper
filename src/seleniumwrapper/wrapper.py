@@ -2,11 +2,13 @@
 
 import collections
 import inspect
+import time
 from selenium.webdriver import Ie, Opera, Chrome, Firefox
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
 
 def create(drivername):
     if not isinstance(drivername, str):
@@ -74,6 +76,19 @@ class SeleniumWrapper(object):
     def _is_selectable(self):
         return self.unwrap.tag_name == u'select'
 
+    def _polling(self, element, func, timeout):
+        err_messages = []
+        endtime = time.time() + timeout
+        while True:
+            try:
+                func(element)
+                return []
+            except WebDriverException, e:
+                err_messages.append(e.message)
+            time.sleep(0.02)
+            if (time.time() > endtime):
+                return err_messages
+
     def waitfor(self, type, target, eager=False, timeout=3):
         if eager:
             types = {"id":lambda d: d.find_elements_by_id(target),
@@ -94,20 +109,37 @@ class SeleniumWrapper(object):
                      "class":lambda d: d.find_element_by_class_name(target),
                      "css":lambda d: d.find_element_by_css_selector(target), }
         finder = types[type]
-        result = WebDriverWait(self._driver, timeout).until(finder)
-        if eager and len(result):
-            return SeleniumContainerWrapper(result)
-        elif _is_wrappable(result):
-            return SeleniumWrapper(result)
-        else:
-            return result
+        try:
+            result = WebDriverWait(self._driver, timeout).until(finder)
+            if eager and len(result):
+                return SeleniumContainerWrapper(result)
+            elif _is_wrappable(result):
+                return SeleniumWrapper(result)
+            else:
+                return result
+        except TimeoutException:
+            template = ("Wait for elemtent to appear for {sec} seconds, ",
+                        "but {type}:{target} didn't appear.")
+            msg = "".join(template).format(sec=timeout, type=type, target=target)
+            raise NoSuchElementException(msg)
 
     def click(self, timeout=2):
         if isinstance(self._driver, WebElement):
-            WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
-            self._driver.click()
-            return True
-        return False
+            try:
+                WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
+                error_messages = self._polling(self._driver, lambda d: d.click(), timeout)
+                if error_messages:
+                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
+                                "but clicked other elements.")
+                    msg = "".join(template).format(sec=timeout, fail_clicked=str(fail_clicked))
+                    raise WebDriverException(msg)
+            except TimeoutException:
+                template = ("Wait for elemtent to be displayed for {sec} seconds, ",
+                            "but {target} was not displayed.")
+                msg = "".join(template).format(sec=timeout, target=str(self._driver))
+                raise NoSuchElementException(msg)
+            except WebDriverException, e:
+                raise e
 
     def xpath(self, target, eager=False, timeout=3):
         return self.waitfor("xpath", target, eager, timeout)
