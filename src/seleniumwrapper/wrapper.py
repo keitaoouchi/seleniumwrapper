@@ -158,7 +158,7 @@ class SeleniumWrapper(object):
     def css(self, target, eager=False, timeout=3):
         return self.waitfor("css", target, eager, timeout)
 
-    def tag(self, target, eager=False, timeout=3):
+    def by_tag(self, target, eager=False, timeout=3):
         return self.waitfor("tag", target, eager, timeout)
 
     def by_text(self, text, tag="*", partial=False, eager=False, timeout=3):
@@ -191,7 +191,7 @@ class SeleniumWrapper(object):
             return self.xpath(".//img[contains(@src, '{0}')]".format(ext), eager, timeout)
         return self.xpath(".//img", eager, timeout)
 
-    def submitvalue(self, value, eager=False, timeout=3):
+    def submit_btn(self, value, eager=False, timeout=3):
         return self.xpath("//input[@type='submit' and @value='{}']".format(value), eager, timeout)
 
     @property
