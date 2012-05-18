@@ -78,6 +78,11 @@ class TestSeleniumWrapper(unittest.TestCase):
         wrapper = SeleniumWrapper(mocked_element)
         self.assertRaises(WebDriverException, wrapper.click)
 
+    def test_unwrap_return_its_wrapped_object(self):
+        mocked_element = mock.Mock(WebElement)
+        wrapper = SeleniumWrapper(mocked_element)
+        self.assertIsInstance(wrapper.unwrap, WebElement)
+
 class TestSeleniumWrapperAliases(unittest.TestCase):
 
     def setUp(self):
@@ -120,7 +125,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
 
         self.assertIsInstance(wrapper.xpath("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.css("dummy"), SeleniumWrapper)
-        self.assertIsInstance(wrapper.tag("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_tag("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.by_class("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.by_id("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.by_name("dummy"), SeleniumWrapper)
@@ -128,7 +133,13 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.assertIsInstance(wrapper.by_linktxt("dummy", partial=True), SeleniumWrapper)
         self.assertIsInstance(wrapper.href("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.img(eager=False), SeleniumWrapper)
+        self.assertIsInstance(wrapper.by_text("dummy", "dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.submit_btn("dummy"), SeleniumWrapper)
 
+        wrapped_elem = mock.Mock(WebElement)
+        wrapped_elem.find_element_by_xpath.return_value = mock_elem
+        wrapper = SeleniumWrapper(wrapped_elem)
+        self.assertIsInstance(wrapper.parent, SeleniumWrapper)
 
 def suite():
     suite = unittest.TestSuite()
