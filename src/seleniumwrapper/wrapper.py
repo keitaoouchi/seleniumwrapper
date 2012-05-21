@@ -127,6 +127,8 @@ class SeleniumWrapper(object):
                 raise NoSuchElementException(msg)
             except WebDriverException as e:
                 raise e
+            except Exception as e:
+                raise e
 
     def waitfor(self, type, target, eager=False, timeout=3):
         if eager:
@@ -201,7 +203,7 @@ class SeleniumWrapper(object):
         if alt:
             options.append("@alt='{}'".format(alt))
         if ext:
-            options.append("contains(@src, '{}'".format(ext))
+            options.append("contains(@src, '{}')".format(ext))
         option = " and ".join(options)
         xpath = ".//img" + "[{}]".format(option) if option else ".//img"
         return self.xpath(xpath, eager, timeout)
