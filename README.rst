@@ -65,7 +65,9 @@ SeleniumWrapper
 * parent
     find_element_by_xpath("./parent::node()")
 * select
-    Return Select(self.unwrap) if possible, else return None.
+    Returns Select(self.unwrap) if possible, else return None.
+* alert
+    Returns Alert(switch_to_alert()) object.
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable.
 * waitfor(type, target, eager=False, timeout=3)
@@ -88,13 +90,15 @@ SeleniumWrapper
     find_element_by_link_text(target, timeout). if partial=True, then find_element_by_partial_link_text
 * href(partialurl=None, eager=False, timeout=3):
     find_element_by_xpath("//a", timeout). if partialurl was given, search 'a' tag which href contains partialurl.
-* img(eager=True, ext=None, timeout=3)
+* img(alt=None, ext=None, eager=False, timeout=3)
     find_elements_by_xpath("//img", timeout).
 * button(value, eager=False, timeout=3)
     find_element_by_xpath("//input[@type='submit' and @value='{}']".format(value), timeout)
 
 Recent Change
 -------------
+* 0.2.3
+    * Add ext argument to *img* (alt and ext are both optional.)
 * 0.2.2
     * Add new property *alert*
     * Change *img*'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
