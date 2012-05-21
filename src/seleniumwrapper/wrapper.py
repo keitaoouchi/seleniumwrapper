@@ -73,6 +73,16 @@ class SeleniumWrapper(object):
         else:
             raise AttributeError("'WebDriver' object has no attribute 'parent'")
 
+    @property
+    def select(self):
+        if self._is_selectable():
+            return Select(self.unwrap)
+        return None
+
+    @property
+    def alert(self):
+        return self.switch_to_alert()
+
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)
 
@@ -186,19 +196,13 @@ class SeleniumWrapper(object):
             return self.xpath(".//a[contains(@href, '{0}')]".format(partialurl), eager, timeout)
         return self.xpath(".//a", eager, timeout)
 
-    def img(self, eager=True, ext=None, timeout=3):
-        if ext:
-            return self.xpath(".//img[contains(@src, '{0}')]".format(ext), eager, timeout)
+    def img(self, alt=None, eager=False, timeout=3):
+        if alt:
+            return self.xpath(".//img[@alt='{}'".format(alt), eager, timeout)
         return self.xpath(".//img", eager, timeout)
 
     def button(self, value, eager=False, timeout=3):
         return self.xpath("//input[@type='submit' and @value='{}']".format(value), eager, timeout)
-
-    @property
-    def select(self):
-        if self._is_selectable():
-            return Select(self.unwrap)
-        return None
 
 class SeleniumContainerWrapper(object):
 
@@ -223,4 +227,5 @@ class SeleniumContainerWrapper(object):
         return len(self._iterable)
 
     def __contains__(self, key):
+        key = key.unwrap if isinstance(key, SeleniumWrapper) else key
         return key in self._iterable
