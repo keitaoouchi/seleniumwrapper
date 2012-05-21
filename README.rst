@@ -93,3 +93,9 @@ SeleniumWrapper
 * button(value, eager=False, timeout=3)
     find_element_by_xpath("//input[@type='submit' and @value='{}']".format(value), timeout)
 
+Recent Change
+------------
+* 0.2.2
+    * Add new property *alert*
+    * Change *img*'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
+    * Modify SeleniumContainerWrapper's __contains__ behavior to unwrap given object if it is a SeleniumWrapper.
