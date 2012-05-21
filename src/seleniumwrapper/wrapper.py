@@ -191,7 +191,7 @@ class SeleniumWrapper(object):
             return self.xpath(".//img[contains(@src, '{0}')]".format(ext), eager, timeout)
         return self.xpath(".//img", eager, timeout)
 
-    def submit_btn(self, value, eager=False, timeout=3):
+    def button(self, value, eager=False, timeout=3):
         return self.xpath("//input[@type='submit' and @value='{}']".format(value), eager, timeout)
 
     @property

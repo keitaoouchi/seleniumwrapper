@@ -134,7 +134,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.assertIsInstance(wrapper.href("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.img(eager=False), SeleniumWrapper)
         self.assertIsInstance(wrapper.by_text("dummy", "dummy"), SeleniumWrapper)
-        self.assertIsInstance(wrapper.submit_btn("dummy"), SeleniumWrapper)
+        self.assertIsInstance(wrapper.button("dummy"), SeleniumWrapper)
 
         wrapped_elem = mock.Mock(WebElement)
         wrapped_elem.find_element_by_xpath.return_value = mock_elem
