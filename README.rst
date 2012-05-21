@@ -2,6 +2,14 @@ About this module
 -----------------
 selenium webdriver wrapper to make manipulation easier.
 
+Features
+--------
+
+* Easy to type aliases. (find_element_by_xpath => xpath, etc.)
+* Wrapped WebdriverWait( ... ).until( ... ) pattern.
+* Polling at the time of clicking or selecting.
+* Wrapping chaining.
+
 How to install
 --------------
 Requires python2.6 or later (exclude python3.x).
@@ -56,6 +64,8 @@ SeleniumWrapper
     Retrieves WebDriver or WebElement from wrapped object.
 * parent
     find_element_by_xpath("./parent::node()")
+* select
+    Return Select(self.unwrap) if possible, else return None.
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable.
 * waitfor(type, target, eager=False, timeout=3)
@@ -80,5 +90,6 @@ SeleniumWrapper
     find_element_by_xpath("//a", timeout). if partialurl was given, search 'a' tag which href contains partialurl.
 * img(eager=True, ext=None, timeout=3)
     find_elements_by_xpath("//img", timeout).
-* select
-    Return Select(self.unwrap) if possible, else return None.
+* button(value, eager=False, timeout=3)
+    find_element_by_xpath("//input[@type='submit' and @value='{}']".format(value), timeout)
+
