@@ -132,7 +132,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.assertIsInstance(wrapper.by_linktxt("dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.by_linktxt("dummy", partial=True), SeleniumWrapper)
         self.assertIsInstance(wrapper.href("dummy"), SeleniumWrapper)
-        self.assertIsInstance(wrapper.img(eager=False), SeleniumWrapper)
+        self.assertIsInstance(wrapper.img(alt="dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.by_text("dummy", "dummy"), SeleniumWrapper)
         self.assertIsInstance(wrapper.button("dummy"), SeleniumWrapper)
 

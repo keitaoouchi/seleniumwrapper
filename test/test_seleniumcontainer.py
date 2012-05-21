@@ -74,6 +74,12 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         self.assertTrue(mock1 in container)
         self.assertTrue(mock2 in container)
 
+    def test_container_unwrap_given_object_if_possible_in__contains__protocol(self):
+        mocked = mock.Mock(WebElement)
+        iterable = [mocked]
+        container = SeleniumContainerWrapper(iterable)
+        self.assertTrue(container[0] in container)
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(unittest.makeSuite(TestSeleniumContainerWrapper))
