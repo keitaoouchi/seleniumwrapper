@@ -196,10 +196,15 @@ class SeleniumWrapper(object):
             return self.xpath(".//a[contains(@href, '{0}')]".format(partialurl), eager, timeout)
         return self.xpath(".//a", eager, timeout)
 
-    def img(self, alt=None, eager=False, timeout=3):
+    def img(self, alt=None, ext=None, eager=False, timeout=3):
+        options = []
         if alt:
-            return self.xpath(".//img[@alt='{}'".format(alt), eager, timeout)
-        return self.xpath(".//img", eager, timeout)
+            options.append("@alt='{}'".format(alt))
+        if ext:
+            options.append("contains(@src, '{}'".format(ext))
+        option = " and ".join(options)
+        xpath = ".//img" + "[{}]".format(option) if option else ".//img"
+        return self.xpath(xpath, eager, timeout)
 
     def button(self, value, eager=False, timeout=3):
         return self.xpath("//input[@type='submit' and @value='{}']".format(value), eager, timeout)
