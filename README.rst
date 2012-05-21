@@ -97,6 +97,8 @@ SeleniumWrapper
 
 Recent Change
 -------------
+* 0.2.4
+    * Fix bug.
 * 0.2.3
     * Add ext argument to *img* (alt and ext are both optional.)
 * 0.2.2

@@ -3,6 +3,7 @@
 import collections
 import inspect
 import time
+import random
 from selenium.webdriver import Ie, Opera, Chrome, Firefox
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -236,3 +237,14 @@ class SeleniumContainerWrapper(object):
     def __contains__(self, key):
         key = key.unwrap if isinstance(key, SeleniumWrapper) else key
         return key in self._iterable
+
+    def sample(self, size):
+        picked = random.sample(self._driver, size)
+        return SeleniumContainerWrapper(picked)
+
+    def choice(self):
+        picked = random.choice(self._driver)
+        if _is_wrappable(picked):
+            return SeleniumWrapper(picked)
+        else:
+            return picked
