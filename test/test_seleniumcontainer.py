@@ -80,6 +80,22 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         container = SeleniumContainerWrapper(iterable)
         self.assertTrue(container[0] in container)
 
+    def test_sample_returns_random_sample_from_its_wrapped_iterable(self):
+        iterable = [mock.Mock(WebElement) for i in range(10)]
+        container = SeleniumContainerWrapper(iterable)
+        sampled = container.sample(5)
+        self.assertTrue(isinstance(sampled, SeleniumContainerWrapper))
+        self.assertEquals(len(sampled), 5)
+        for sample in sampled:
+            self.assertTrue(sample in container)
+
+    def test_choice_returns_random_choice_from_its_wrapped_iterable(self):
+        iterable = [mock.Mock(WebElement) for i in range(10)]
+        container = SeleniumContainerWrapper(iterable)
+        picked = container.choice()
+        self.assertTrue(isinstance(picked, SeleniumWrapper))
+        self.assertTrue(picked in container)
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(unittest.makeSuite(TestSeleniumContainerWrapper))

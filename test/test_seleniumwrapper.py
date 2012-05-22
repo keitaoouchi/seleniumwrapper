@@ -76,7 +76,21 @@ class TestSeleniumWrapper(unittest.TestCase):
         mocked_element = mock.Mock(WebElement)
         mocked_element.click = dummy
         wrapper = SeleniumWrapper(mocked_element)
-        self.assertRaises(WebDriverException, wrapper.click)
+        self.assertRaises(WebDriverException, wrapper.click, **{'timeout':0.5})
+
+    def test_click_should_raise_if_element_is_not_displayed_for_timeout_seconds(self):
+        mocked_element = mock.Mock(WebElement)
+        mocked_element.is_displayed = lambda : False
+        wrapper = SeleniumWrapper(mocked_element)
+        self.assertRaises(NoSuchElementException, wrapper.click, **{'timeout':0.5})
+
+    def test_click_should_raise_if_other_exception_is_thrown(self):
+        def dummy():
+            raise TypeError()
+        mocked_element = mock.Mock(WebElement)
+        mocked_element.click = dummy
+        wrapper = SeleniumWrapper(mocked_element)
+        self.assertRaises(TypeError, wrapper.click, **{'timeout':0.5})
 
     def test_unwrap_return_its_wrapped_object(self):
         mocked_element = mock.Mock(WebElement)
