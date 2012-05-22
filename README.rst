@@ -177,6 +177,7 @@ Recent Change
     * Add **checkbox**, **radio**.
     * Change **select** property to method.
     * Add **sample**, **choice** methods to SeleniumContainerWrapper.
+    * Fix **click** bug.
 * 0.2.4
     * Fix bug.
 * 0.2.3
