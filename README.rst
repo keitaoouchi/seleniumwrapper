@@ -28,7 +28,7 @@ also you need selenium::
 Example to use
 --------------
 
-*create* function helps you to init webdriver and wrap it easily::
+**create** function helps you to init webdriver and wrap it easily::
 
     >>> import seleniumwrapper as selwrap
     >>> br = selwrap.create("chrome")
@@ -40,7 +40,7 @@ SeleniumWrapper delegate to its wrapped webdriver::
     >>> br.xpath("//div[@class='main'])
     <seleniumwrapper.wrapper.SeleniumWrapper object at 0x...>
 
-Setting *eager=True* to invoke find_elements::
+Setting **eager=True** to invoke find_elements::
 
     >>> br.xpath("//a", eager=True)
     <seleniumwrapper.wrapper.SeleniumContainerWrapper object at 0x...>
@@ -82,7 +82,7 @@ SeleniumWrapper
 * css(target, eager=False, timeout=3)
     find_element_by_css_selector(target, timeout)::
         >>> [li.text for li in br.css("ul li")]
-* by_tag(self, tag, eager=False, timeout=3, **attributes)
+* by_tag(self, tag, eager=False, timeout=3, \*\*attributes)
     Returns specified tagged element with specified attributes optionally.::
         >>> br.by_tag("link", rel="stylesheet")
 * by_text(text, tag='*', partial=False, eager=False, timeout=3)
@@ -109,13 +109,13 @@ SeleniumWrapper
 * button(value, eager=False, timeout=3)
     find_element_by_xpath("//input[@type='submit' or @type='button' and @value='{}']".format(value), timeout)::
         >>> br.button("Send this form").click()
-* checkbox(self, eager=False, timeout=3, **attributes)
+* checkbox(self, eager=False, timeout=3, \*\*attributes)
     Returns 'input' element type='checkbox'::
         >>> br.checkbox(name='checked_value', id='hoge')
-* radio(self, eager=False, timeout=3, **attributes)
+* radio(self, eager=False, timeout=3, \*\*attributes)
     Retuns 'input' element type='radio'.::
         >>> br.radio(name='hoge', id='fuga').click()
-* select(self, eager=False, timeout=3, **attributes)
+* select(self, eager=False, timeout=3, \*\*attributes)
     Returns Select(self.by_tag("select", eager, timeout, **attributes) or their wrapped SeleniumContainerWrapper::
         >>> br.select(name="hoge").select_by_index(1)
         >>> [select.is_multiple for select in br.select(eager=True, name="hoge")]
@@ -123,15 +123,15 @@ SeleniumWrapper
 Recent Change
 -------------
 * 0.3
-    * Change *tag* method to *by_tag*.
-    * Add *checkbox*, *radio*.
-    * Change *select* property to method.
-    * Add *sample*, *choice* methods to SeleniumContainerWrapper.
+    * Change **tag** method to **by_tag**.
+    * Add **checkbox**, **radio**.
+    * Change **select** property to method.
+    * Add **sample**, **choice** methods to SeleniumContainerWrapper.
 * 0.2.4
     * Fix bug.
 * 0.2.3
-    * Add ext argument to *img* (alt and ext are both optional.)
+    * Add ext argument to **img** (alt and ext are both optional.)
 * 0.2.2
-    * Add new property *alert*
-    * Change *img*'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
+    * Add new property **alert**
+    * Change **img**'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
     * Modify SeleniumContainerWrapper's __contains__ behavior to unwrap given object if it is a SeleniumWrapper.
