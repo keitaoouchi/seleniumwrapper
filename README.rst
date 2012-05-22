@@ -62,63 +62,113 @@ SeleniumWrapper
 ^^^^^^^^^^^^^^^
 * unwrap
     Retrieves WebDriver or WebElement from wrapped object::
+    
         >>> isinstance(br.unwrap, WebElement)
         True
+
 * parent
     find_element_by_xpath("./parent::node()")::
+
         >>> price = br.by_tag("th", "Price").parent.by_tag("td").text
+
 * alert
     Returns Alert(switch_to_alert()) object::
+
         >>> br.alert.accept()
+
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable::
+
         >>> br.button("Send").click()
+
 * waitfor(type, target, eager=False, timeout=3)
     See source::
+
         >>> br.waitfor("xpath", "//input[@type='submit']")
+
 * xpath(target, eager=False, timeout=3)
     find_element_by_xpath(target, timeout)::
+
         >>> buttons = br.xpath("//input[@type='submit' or @type='button']", eager=True)
+
 * css(target, eager=False, timeout=3)
     find_element_by_css_selector(target, timeout)::
+
         >>> [li.text for li in br.css("ul li")]
+
 * by_tag(self, tag, eager=False, timeout=3, \*\*attributes)
     Returns specified tagged element with specified attributes optionally.::
+
         >>> br.by_tag("link", rel="stylesheet")
+
 * by_text(text, tag='*', partial=False, eager=False, timeout=3)
     similar to find_element_by_link_text or find_element_by_partial_link_text, but this method can be applicable to any tag::
+
         >>> br.by_text("Go back to Top Page", "a")
+
 * by_class(target, eager=False, timeout=3)
     find_element_by_class_name(target, timeout)::
+
         >>> br.by_class("colored")
+
 * by_id(target, eager=False, timeout=3)
     find_element_by_id(target, timeout)::
+
         >>> br.by_id("main_contents")
+
 * by_name(target, eager=False, timeout=3)
     find_element_by_name(target, timeout)::
+
         >>> br.by_name("page_password")
+
 * by_linktxt(target, eager=False, timeout=3, partial=False)
     find_element_by_link_text(target, timeout). if partial=True, then find_element_by_partial_link_text::
+
         >>> br.by_linktxt("Go back to", partial=True)
+
 * href(partialurl=None, eager=False, timeout=3):
     find_element_by_xpath("//a", timeout). if partialurl was given, search 'a' tag which href contains partialurl::
+
         >>> phplinks = br.href(".php", eager=True)
+
 * img(alt=None, ext=None, eager=False, timeout=3)
     find_elements_by_xpath("//img", timeout)::
+
         >>> br.img(alt="I am sorry", ext="sorry.gif")
+
 * button(value, eager=False, timeout=3)
     find_element_by_xpath("//input[@type='submit' or @type='button' and @value='{}']".format(value), timeout)::
+
         >>> br.button("Send this form").click()
+
 * checkbox(self, eager=False, timeout=3, \*\*attributes)
     Returns 'input' element type='checkbox'::
+
         >>> br.checkbox(name='checked_value', id='hoge')
+
 * radio(self, eager=False, timeout=3, \*\*attributes)
     Retuns 'input' element type='radio'.::
+
         >>> br.radio(name='hoge', id='fuga').click()
+
 * select(self, eager=False, timeout=3, \*\*attributes)
     Returns Select(self.by_tag("select", eager, timeout, **attributes) or their wrapped SeleniumContainerWrapper::
+
         >>> br.select(name="hoge").select_by_index(1)
         >>> [select.is_multiple for select in br.select(eager=True, name="hoge")]
+        
+SeleniumContainerWrapper
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+* sample(size)
+    Returns random.sample(self._iterable, size)::
+
+        >>> br.img(eager=True).sample(10)
+
+* choice()
+    Returns random.choice(self._iterable)::
+
+        >>> br.img(eager=True).choice()
 
 Recent Change
 -------------
