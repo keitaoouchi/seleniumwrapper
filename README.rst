@@ -152,7 +152,7 @@ SeleniumWrapper
         >>> br.radio(name='hoge', id='fuga').click()
 
 * select(self, eager=False, timeout=3, \*\*attributes)
-    Returns Select(self.by_tag("select", eager, timeout, **attributes) or their wrapped SeleniumContainerWrapper::
+    Returns Select(self.by_tag("select", eager, timeout, \*\*attributes) or their wrapped SeleniumContainerWrapper::
 
         >>> br.select(name="hoge").select_by_index(1)
         >>> [select.is_multiple for select in br.select(eager=True, name="hoge")]
