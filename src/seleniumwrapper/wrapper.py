@@ -47,7 +47,7 @@ def _chainreact(__getattr__):
             def reaction(*realargs):
                 result = methodobj(*realargs)
                 # for side-effective method(append, ...)
-                result = result if result else self
+                result = result if result is not None else self
                 return wrap_or_else(result)
             return reaction
         else:
@@ -75,10 +75,10 @@ class SeleniumWrapper(object):
             raise AttributeError("'WebDriver' object has no attribute 'parent'")
 
     @property
-    def select(self):
+    def to_select(self):
         if self._is_selectable():
             return Select(self.unwrap)
-        return None
+        raise TypeError("Must be 'select' element.")
 
     @property
     def alert(self):
@@ -123,8 +123,10 @@ class SeleniumWrapper(object):
                     time.sleep(postsleep)
             except TimeoutException:
                 template = ("Wait for elemtent to be displayed for {sec} seconds, ",
-                            "but {target} was not displayed.")
-                msg = "".join(template).format(sec=timeout, target=str(self._driver))
+                            "but {target}:@{position} was not displayed.")
+                location = self._driver.location
+                position = "[x:{}, y:{}]".format(location['x'], location['y'])
+                msg = "".join(template).format(sec=timeout, self._driver.tag_name, position)
                 raise NoSuchElementException(msg)
             except WebDriverException as e:
                 raise e
@@ -172,8 +174,8 @@ class SeleniumWrapper(object):
         return self.waitfor("css", target, eager, timeout)
 
     def by_tag(self, tag, eager=False, timeout=3, **attributes):
-        subjects = ["@{key}='{val}'".format(k, attributes[k]) for k in attributes]
-        subject = " and ".format(subjects)
+        subjects = ["@{key}='{val}'".format(key=k, val=attributes[k]) for k in attributes]
+        subject = " and ".join(subjects)
         xpath = ".//{tag}[{subject}]".format(tag=tag, subject=subject) if subject else ".//{tag}".format(tag=tag)
         return self.waitfor('xpath', xpath, eager, timeout)
 
@@ -213,13 +215,29 @@ class SeleniumWrapper(object):
         return self.xpath(xpath, eager, timeout)
 
     def button(self, value, eager=False, timeout=3):
-        return self.xpath("//input[@type='submit' and @value='{}']".format(value), eager, timeout)
+        return self.xpath("//input[@type='submit' or @type='button' and @value='{}']".format(value), eager, timeout)
 
-    def checkbox(self):
-        pass
+    def checkbox(self, eager=False, timeout=3, **attributes):
+        attributes["type"] = "checkbox"
+        return self.by_tag("input", eager, timeout, **attributes)
 
-    def radio(self):
-        pass
+    def radio(self, eager=False, timeout=3, **attributes):
+        attributes["type"] = "radio"
+        return self.by_tag("input", eager, timeout, **attributes)
+
+    def select(self, eager=False, timeout=3, **attributes):
+        selected = self.by_tag("select", eager, timeout, **attributes)
+        if isinstance(selected, SeleniumWrapper) and selected._is_selectable():
+            return Select(selected.unwrap)
+        elif isinstance(selected, SeleniumContainerWrapper):
+            iterable = selected._iterable
+            selected._iterable = [Select(element) for element in iterable if element.tag_name == 'select']
+            return selected
+        else:
+            template = ("Wait for elemtent to appear for {sec} seconds, ",
+                        "but select:{attr} didn't appear.")
+            msg = "".join(template).format(sec=timeout, attr=attributes)
+            raise NoSuchElementException(msg)
 
 class SeleniumContainerWrapper(object):
 
