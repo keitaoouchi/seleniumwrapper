@@ -103,7 +103,7 @@ class SeleniumWrapper(object):
                 return []
             except WebDriverException as e:
                 err_messages.append(e.message)
-            time.sleep(0.02)
+            time.sleep(0.5)
             if (time.time() > endtime):
                 return err_messages
 
@@ -171,8 +171,11 @@ class SeleniumWrapper(object):
     def css(self, target, eager=False, timeout=3):
         return self.waitfor("css", target, eager, timeout)
 
-    def by_tag(self, target, eager=False, timeout=3):
-        return self.waitfor("tag", target, eager, timeout)
+    def by_tag(self, tag, eager=False, timeout=3, **attributes):
+        subjects = ["@{key}='{val}'".format(k, attributes[k]) for k in attributes]
+        subject = " and ".format(subjects)
+        xpath = ".//{tag}[{subject}]".format(tag=tag, subject=subject) if subject else ".//{tag}".format(tag=tag)
+        return self.waitfor('xpath', xpath, eager, timeout)
 
     def by_text(self, text, tag="*", partial=False, eager=False, timeout=3):
         if partial:
@@ -212,6 +215,12 @@ class SeleniumWrapper(object):
     def button(self, value, eager=False, timeout=3):
         return self.xpath("//input[@type='submit' and @value='{}']".format(value), eager, timeout)
 
+    def checkbox(self):
+        pass
+
+    def radio(self):
+        pass
+
 class SeleniumContainerWrapper(object):
 
     def __init__(self, iterable):
@@ -239,11 +248,13 @@ class SeleniumContainerWrapper(object):
         return key in self._iterable
 
     def sample(self, size):
-        picked = random.sample(self._driver, size)
-        return SeleniumContainerWrapper(picked)
+        picked = random.sample(self._iterable, size)
+        if isinstance(picked, collections.Sequence):
+            return SeleniumContainerWrapper(picked)
+        return picked
 
     def choice(self):
-        picked = random.choice(self._driver)
+        picked = random.choice(self._iterable)
         if _is_wrappable(picked):
             return SeleniumWrapper(picked)
         else:
