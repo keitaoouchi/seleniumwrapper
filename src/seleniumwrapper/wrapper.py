@@ -99,7 +99,7 @@ class SeleniumWrapper(object):
         before = (self._driver.location['x'], self._driver.location['y'])
         time.sleep(interval)
         after = (self._driver.location['x'], self._driver.location['y'])
-        return before[0] == after[0] and before[1] and after[1]
+        return before[0] == after[0] and before[1] == after[1]
 
     def _wait_until_stopping(self, timeout, interval):
         timeout = time.time() + timeout
@@ -109,7 +109,7 @@ class SeleniumWrapper(object):
             else:
                 time.sleep(interval)
         if not self._is_stopping(interval):
-            raise WebDriverException("Element is not stably displayed for {sec} seconds.".format(timeout))
+            raise WebDriverException("Element is not stably displayed for {sec} seconds.".format(sec=timeout))
 
     def _wait_until_clickable(self, timeout, interval):
         err_messages = []
@@ -119,12 +119,12 @@ class SeleniumWrapper(object):
                 self._driver.click()
                 break
             except WebDriverException as e:
-                err_messages.append(e.msg)
+                err_messages.append(e.msg.split(":")[-1].strip())
             time.sleep(interval)
             if (time.time() > endtime):
                 if err_messages:
                     template = ("Wait for elemtent to be clickable for {sec} seconds, ",
-                                "but clicked other elements.{err}")
+                                "but clicked other elements. {err}")
                     msg = "".join(template).format(sec=timeout, err=err_messages)
                     raise WebDriverException(msg)
 
@@ -133,7 +133,7 @@ class SeleniumWrapper(object):
             WebDriverWait(self._driver, timeout, interval).until(lambda d: d.is_displayed())
         except TimeoutException:
             template = ("Wait for elemtent to be displayed for {sec} seconds, ",
-                        "but {target} was not displayed::\n{dumped}")
+                        "but <{target} ...> was not displayed:: <{dumped}>")
             msg = "".join(template).format(sec=timeout, target=self._driver.tag_name, dumped=self._dump())
             raise ElementNotVisibleException(msg)
 
@@ -145,16 +145,17 @@ class SeleniumWrapper(object):
                 "width": element.value_of_css_property("width"),
                 "x": element.location["x"],
                 "y": element.location["y"]}
-        dumped = "\n".join(["\t{k}: {v}".format(k, info[k]) for k in info])
+        dumped = " ".join(["{k}:{v}".format(k=k, v=info[k]) for k in info])
+        return dumped
 
     def click(self, timeout=3, presleep=0, postsleep=0):
         if isinstance(self._driver, WebElement):
             try:
                 if presleep:
                     time.sleep(presleep)
-                self._wait_until_stopping(3, 0.1)
-                self._wait_until_displayed(3, 0.5)
-                self._wait_until_clickable(3, 0.5)
+                self._wait_until_stopping(timeout, 0.1)
+                self._wait_until_displayed(timeout, 0.5)
+                self._wait_until_clickable(timeout, 0.5)
                 if postsleep:
                     time.sleep(postsleep)
             except Exception as e:
