@@ -1,3 +1,3 @@
-from .wrapper import SeleniumWrapper, create
+from .wrapper import SeleniumWrapper, create, connect
 
-__all__ = ['SeleniumWrapper', 'create']
+__all__ = ['SeleniumWrapper', 'create', 'connect']

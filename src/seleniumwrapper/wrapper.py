@@ -4,6 +4,7 @@ import collections
 import inspect
 import time
 import random
+import selenium
 from selenium.webdriver import Ie, Opera, Chrome, Firefox
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
@@ -11,8 +12,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
                                         WebDriverException, ElementNotVisibleException)
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-def create(drivername):
+def create(drivername, *args, **kwargs):
     if not isinstance(drivername, str):
         msg = "drivername should be an instance of string. given {0}".format(type(drivername))
         raise TypeError(msg)
@@ -23,7 +25,37 @@ def create(drivername):
     dname = drivername.lower()
     if dname in drivers:
         try:
-            return SeleniumWrapper(drivers[dname]())
+            return SeleniumWrapper(drivers[dname](*args, **kwargs))
+        except Exception as e:
+            raise e
+    else:
+        msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given {0}".format(drivername)
+        raise ValueError(msg)
+
+def connect(drivername, executor, custom_capabilities=None, **kwargs):
+    if not isinstance(drivername, str):
+        msg = "drivername should be an instance of string. given {0}".format(type(drivername))
+        raise TypeError(msg)
+    if not isinstance(executor, str):
+        msg = "executor should be an instance of string. given {0}".format(type(executor))
+        raise TypeError(msg)
+    if custom_capabilities and not isinstance(custom_capabilities, dict):
+        msg = "custom_capabilities should be an instance of dict. given {0}".format(type(custom_capabilities))
+        raise TypeError(msg)
+    capabilities = {'ie': DesiredCapabilities.INTERNETEXPLORER,
+                    'opera': DesiredCapabilities.OPERA,
+                    'chrome': DesiredCapabilities.CHROME,
+                    'firefox': DesiredCapabilities.FIREFOX,
+                    'android': DesiredCapabilities.ANDROID}
+    dname = drivername.lower()
+    if dname in capabilities:
+        capability = capabilities[drivername]
+        custom_capabilities = custom_capabilities or {}
+        for key in custom_capabilities:
+            capability[key] = custom_capabilities[key]
+        driver = selenium.webdriver.Remote(executor, capability, **kwargs)
+        try:
+            return SeleniumWrapper(driver)
         except Exception as e:
             raise e
     else:
@@ -91,6 +123,11 @@ class SeleniumWrapper(object):
     @_chainreact
     def __getattr__(self, name):
         return self._driver, getattr(self._driver, name)
+
+    @property
+    def current_url(self):
+        self.by_tag("body", 1)
+        return self._driver.current_url
 
     def _is_selectable(self):
         return self.unwrap.tag_name == 'select'
