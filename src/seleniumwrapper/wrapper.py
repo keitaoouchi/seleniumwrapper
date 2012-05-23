@@ -9,7 +9,8 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException, TimeoutException, WebDriverException
+from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
+                                        WebDriverException, ElementNotVisibleException)
 
 def create(drivername):
     if not isinstance(drivername, str):
@@ -94,42 +95,68 @@ class SeleniumWrapper(object):
     def _is_selectable(self):
         return self.unwrap.tag_name == 'select'
 
-    def _polling(self, element, func, timeout):
+    def _is_stopping(self, interval):
+        before = (self._driver.location['x'], self._driver.location['y'])
+        time.sleep(interval)
+        after = (self._driver.location['x'], self._driver.location['y'])
+        return before[0] == after[0] and before[1] and after[1]
+
+    def _wait_until_stopping(self, timeout, interval):
+        timeout = time.time() + timeout
+        while time.time() < timeout:
+            if self._is_stopping(interval):
+                return True
+            else:
+                time.sleep(interval)
+        if not self._is_stopping(interval):
+            raise WebDriverException("Element is not stably displayed for {sec} seconds.".format(timeout))
+
+    def _wait_until_clickable(self, timeout, interval):
         err_messages = []
         endtime = time.time() + timeout
         while True:
             try:
-                func(element)
-                return []
+                self._driver.click()
+                break
             except WebDriverException as e:
-                err_messages.append(e.message)
-            time.sleep(0.5)
+                err_messages.append(e.msg)
+            time.sleep(interval)
             if (time.time() > endtime):
-                return err_messages
+                if err_messages:
+                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
+                                "but clicked other elements.{err}")
+                    msg = "".join(template).format(sec=timeout, err=err_messages)
+                    raise WebDriverException(msg)
+
+    def _wait_until_displayed(self, timeout, interval):
+        try:
+            WebDriverWait(self._driver, timeout, interval).until(lambda d: d.is_displayed())
+        except TimeoutException:
+            template = ("Wait for elemtent to be displayed for {sec} seconds, ",
+                        "but {target} was not displayed::\n{dumped}")
+            msg = "".join(template).format(sec=timeout, target=self._driver.tag_name, dumped=self._dump())
+            raise ElementNotVisibleException(msg)
+
+    def _dump(self):
+        element = self._driver
+        info = {"visibility": element.value_of_css_property("visibility"),
+                "display": element.value_of_css_property("display"),
+                "height": element.value_of_css_property("height"),
+                "width": element.value_of_css_property("width"),
+                "x": element.location["x"],
+                "y": element.location["y"]}
+        dumped = "\n".join(["\t{k}: {v}".format(k, info[k]) for k in info])
 
     def click(self, timeout=3, presleep=0, postsleep=0):
         if isinstance(self._driver, WebElement):
             try:
                 if presleep:
                     time.sleep(presleep)
-                WebDriverWait(self._driver, timeout).until(lambda d: d.is_displayed())
-                error_messages = self._polling(self._driver, lambda d: d.click(), timeout)
-                if error_messages:
-                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
-                                "but clicked other elements.")
-                    msg = "".join(template).format(sec=timeout)
-                    raise WebDriverException(msg)
+                self._wait_until_stopping(3, 0.1)
+                self._wait_until_displayed(3, 0.5)
+                self._wait_until_clickable(3, 0.5)
                 if postsleep:
                     time.sleep(postsleep)
-            except TimeoutException:
-                template = ("Wait for elemtent to be displayed for {sec} seconds, ",
-                            "but {target}:@{position} was not displayed.")
-                location = self._driver.location
-                position = "[x:{}, y:{}]".format(location['x'], location['y'])
-                msg = "".join(template).format(sec=timeout, self._driver.tag_name, position)
-                raise NoSuchElementException(msg)
-            except WebDriverException as e:
-                raise e
             except Exception as e:
                 raise e
 
