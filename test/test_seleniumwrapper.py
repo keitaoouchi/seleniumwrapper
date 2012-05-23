@@ -5,11 +5,37 @@ sys.path.append("./../src")
 import unittest
 import mock
 import seleniumwrapper
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwrapper.wrapper import SeleniumWrapper
 from seleniumwrapper.wrapper import SeleniumContainerWrapper
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException, ElementNotVisibleException
+
+class TestSeleniumWrapperFactory(unittest.TestCase):
+
+    def test_factory_functions_raise_typeerror_if_argument_is_not_a_string(self):
+        self.assertRaises(TypeError, seleniumwrapper.create, 1)
+        self.assertRaises(TypeError, seleniumwrapper.connect, 1, "http://somethings:9999/wd/hub")
+        self.assertRaises(TypeError, seleniumwrapper.connect, "android", 1)
+
+    def test_fuctory_functions_raise_valueerror_if_invalid_drivername_is_given(self):
+        self.assertRaises(ValueError, seleniumwrapper.create, 'Chorome')
+        self.assertRaises(ValueError, seleniumwrapper.create, 'Firedog')
+        self.assertRaises(ValueError, seleniumwrapper.connect, 'Chorome', "http://localhost:8080/wd/hub")
+        self.assertRaises(ValueError, seleniumwrapper.connect, 'Firedog', "http://localhost:8080/wd/hub")
+
+    def test_connect_merge_3rd_arguments_with_desired_capabilities(self):
+        p = mock.patch("selenium.webdriver.Remote")
+        m = p.start()
+        p2 = mock.patch("seleniumwrapper.wrapper.SeleniumWrapper")
+        m2 = p2.start()
+        seleniumwrapper.connect("android", "http://localhost:4444/wd/hub", {"hoge":"hoge"})
+        dic = DesiredCapabilities.ANDROID
+        dic["hoge"] = "hoge"
+        m.assert_called_once_with('http://localhost:4444/wd/hub', dic)
+        p2.stop()
+        p.stop()
 
 class TestSeleniumWrapper(unittest.TestCase):
 
@@ -47,13 +73,6 @@ class TestSeleniumWrapper(unittest.TestCase):
         wrapper = SeleniumWrapper(mocked_driver)
         self.assertEquals(wrapper.waitfor('id', 'hoge'), 'hoge')
 
-    def test_create_raise_typeerror_if_argument_is_not_a_string(self):
-        self.assertRaises(TypeError, seleniumwrapper.create, 1)
-
-    def test_create_raise_valueerror_if_argument_is_invalid_drivername(self):
-        self.assertRaises(ValueError, seleniumwrapper.create, 'Chorome')
-        self.assertRaises(ValueError, seleniumwrapper.create, 'Firedog')
-
     def test_wrapper_should_handle_attr_access_even_if_attr_is_descriptor(self):
         mocked_element = mock.Mock(WebElement)
         class Hoge(WebDriver):
@@ -70,19 +89,36 @@ class TestSeleniumWrapper(unittest.TestCase):
         self.assertEquals(wrapper.num, 100)
         self.assertTrue(isinstance(wrapper.hoge, SeleniumWrapper), wrapper.hoge)
 
+    def test_click_should_raise_if_element_is_not_stopping_for_time_seconds(self):
+        class Hoge(object):
+            def __init__(self):
+                self.num = 0
+            def __getitem__(self, num):
+                self.num += 1
+                return self.num
+
+        mocked_element = mock.Mock(WebElement)
+        mocked_element.location = Hoge()
+        wrapper = SeleniumWrapper(mocked_element)
+        self.assertRaises(WebDriverException, wrapper.click, **{'timeout':0.5})
+
     def test_click_should_raise_if_element_is_not_clickable_for_timeout_seconds(self):
         def dummy():
             raise WebDriverException("hoge:fuga:huhuhu")
         mocked_element = mock.Mock(WebElement)
         mocked_element.click = dummy
+        mocked_element.value_of_css_property.return_value = 0
+        mocked_element.location = {"x":0, "y":0}
         wrapper = SeleniumWrapper(mocked_element)
         self.assertRaises(WebDriverException, wrapper.click, **{'timeout':0.5})
 
     def test_click_should_raise_if_element_is_not_displayed_for_timeout_seconds(self):
         mocked_element = mock.Mock(WebElement)
         mocked_element.is_displayed = lambda : False
+        mocked_element.value_of_css_property.return_value = 0
+        mocked_element.location = {"x":0, "y":0}
         wrapper = SeleniumWrapper(mocked_element)
-        self.assertRaises(NoSuchElementException, wrapper.click, **{'timeout':0.5})
+        self.assertRaises(ElementNotVisibleException, wrapper.click, **{'timeout':0.5})
 
     def test_click_should_raise_if_other_exception_is_thrown(self):
         def dummy():
