@@ -36,7 +36,7 @@ Example to use
 
 **connect** function helps you to use remote webdriver and wrap it::
 
-    >>> br = connect("android", "http:\//localhost:9999", {"acceptSslCerts": True})
+    >>> br = connect("android", "http://localhost:9999", {"acceptSslCerts": True})
 
 SeleniumWrapper delegate to its wrapped webdriver::
 
