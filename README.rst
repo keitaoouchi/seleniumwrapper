@@ -5,6 +5,7 @@ selenium webdriver wrapper to make manipulation easier.
 Features
 --------
 
+* Support remote webdriver.
 * Easy to type aliases. (find_element_by_xpath => xpath, etc.)
 * Wrapped WebdriverWait( ... ).until( ... ) pattern.
 * Polling at the time of clicking or selecting.
@@ -32,6 +33,10 @@ Example to use
 
     >>> import seleniumwrapper as selwrap
     >>> br = selwrap.create("chrome")
+
+**connect** function helps you to use remote webdriver and wrap it::
+
+    >>> br = connect("android", "http:\//localhost:9999", {"acceptSslCerts": True})
 
 SeleniumWrapper delegate to its wrapped webdriver::
 
@@ -62,7 +67,7 @@ SeleniumWrapper
 ^^^^^^^^^^^^^^^
 * unwrap
     Retrieves WebDriver or WebElement from wrapped object::
-    
+
         >>> isinstance(br.unwrap, WebElement)
         True
 
@@ -156,7 +161,7 @@ SeleniumWrapper
 
         >>> br.select(name="hoge").select_by_index(1)
         >>> [select.is_multiple for select in br.select(eager=True, name="hoge")]
-        
+
 SeleniumContainerWrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -172,7 +177,9 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
-* 0.3
+* 0.3.1
+    * Add **connect** functon.
+* 0.3.0
     * Change **tag** method to **by_tag**.
     * Add **checkbox**, **radio**.
     * Change **select** property to method.
