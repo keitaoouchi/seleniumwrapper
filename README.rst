@@ -177,6 +177,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.3.2
+    * Change **alert** to wait unitl page body loaded.
 * 0.3.1
     * Add **connect** functon.
 * 0.3.0
