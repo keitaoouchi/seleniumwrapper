@@ -82,7 +82,7 @@ SeleniumWrapper
         >>> br.alert.accept()
 
 * current_url
-    Returns current_url after page body is loaded::
+    Returns current_url after loading page body::
 
         >>> br.current_url
 
