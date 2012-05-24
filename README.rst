@@ -81,6 +81,11 @@ SeleniumWrapper
 
         >>> br.alert.accept()
 
+* current_url
+    Returns current_url after page body is loaded::
+
+        >>> br.current_url
+
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable::
 
