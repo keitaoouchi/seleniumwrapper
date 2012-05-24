@@ -178,7 +178,8 @@ SeleniumContainerWrapper
 Recent Change
 -------------
 * 0.3.2
-    * Change **alert** to wait unitl page body loaded.
+    * Change **alert** to wait until Alert's text is accesible.
+    * Override **current_url** to wait for page body loaded.
 * 0.3.1
     * Add **connect** functon.
 * 0.3.0
