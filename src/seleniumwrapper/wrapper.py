@@ -11,7 +11,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import (NoSuchElementException, TimeoutException,
-                                        WebDriverException, ElementNotVisibleException)
+                                        WebDriverException, ElementNotVisibleException,
+                                        NoAlertPresentException)
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 def create(drivername, *args, **kwargs):
@@ -115,7 +116,16 @@ class SeleniumWrapper(object):
 
     @property
     def alert(self):
-        return self.switch_to_alert()
+        timeout = time.time() + 2
+        while time.time() < timeout:
+            try:
+                alert = self._driver.switch_to_alert()
+                alert.text
+                return alert
+            except NoAlertPresentException:
+                time.sleep(0.1)
+        msg = "Wait for alert to be displayed for 2 seconds, but it was not displayed."
+        raise NoAlertPresentException(msg)
 
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)
@@ -191,8 +201,8 @@ class SeleniumWrapper(object):
                 if presleep:
                     time.sleep(presleep)
                 self._wait_until_stopping(timeout, 0.1)
-                self._wait_until_displayed(timeout, 0.5)
-                self._wait_until_clickable(timeout, 0.5)
+                self._wait_until_displayed(timeout, 0.3)
+                self._wait_until_clickable(timeout, 0.3)
                 if postsleep:
                     time.sleep(postsleep)
             except Exception as e:
