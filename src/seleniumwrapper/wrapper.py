@@ -282,15 +282,15 @@ class SeleniumWrapper(object):
     def img(self, alt=None, ext=None, eager=False, timeout=3):
         options = []
         if alt:
-            options.append("@alt='{}'".format(alt))
+            options.append("@alt='{0}'".format(alt))
         if ext:
-            options.append("contains(@src, '{}')".format(ext))
+            options.append("contains(@src, '{0}')".format(ext))
         option = " and ".join(options)
-        xpath = ".//img" + "[{}]".format(option) if option else ".//img"
+        xpath = ".//img" + "[{0}]".format(option) if option else ".//img"
         return self.xpath(xpath, eager, timeout)
 
     def button(self, value, eager=False, timeout=3):
-        return self.xpath("//input[@type='submit' or @type='button' and @value='{}']".format(value), eager, timeout)
+        return self.xpath("//input[@type='submit' or @type='button' and @value='{0}']".format(value), eager, timeout)
 
     def checkbox(self, eager=False, timeout=3, **attributes):
         attributes["type"] = "checkbox"
