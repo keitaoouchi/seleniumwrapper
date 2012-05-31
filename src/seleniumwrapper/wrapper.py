@@ -201,7 +201,7 @@ class SeleniumWrapper(object):
                 if presleep:
                     time.sleep(presleep)
                 self._wait_until_stopping(timeout, 0.1)
-                self._wait_until_displayed(timeout, 0.3)
+                self._wait_until_displayed(timeout, 0.2)
                 self._wait_until_clickable(timeout, 0.3)
                 if postsleep:
                     time.sleep(postsleep)
