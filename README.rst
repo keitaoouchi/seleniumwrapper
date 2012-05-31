@@ -83,6 +83,11 @@ SeleniumWrapper
 
         >>> br.alert.accept()
 
+* current_url
+    Returns current_url after loading page body::
+
+        >>> br.current_url
+
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable::
 
@@ -180,7 +185,8 @@ SeleniumContainerWrapper
 Recent Change
 -------------
 * 0.3.2
-    * Change **alert** to wait unitl page body loaded.
+    * Change **alert** to wait until Alert's text is accesible.
+    * Override **current_url** to wait for page body loaded.
 * 0.3.1
     * Add **connect** functon.
 * 0.3.0
