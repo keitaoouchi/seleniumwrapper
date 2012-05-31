@@ -1,8 +1,9 @@
 import sys
-
 sys.path.append("./../src")
-
-import unittest
+if sys.version < '2.7':
+    import unittest2 as unittest
+else:
+    import unittest
 import collections
 import mock
 import selenium
