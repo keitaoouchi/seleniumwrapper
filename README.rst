@@ -184,6 +184,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.3.3
+    * Fixed bugs of string formatting.
 * 0.3.2
     * Change **alert** to wait until Alert's text is accesible.
     * Override **current_url** to wait for page body loaded.
