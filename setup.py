@@ -22,6 +22,7 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules'
 ]
 
+requires = ['selenium>=2.22.1']
 
 setup(
     author='Keita Oouchi',
@@ -36,4 +37,5 @@ setup(
     classifiers=classifiers,
     description = 'selenium webdriver wrapper to make manipulation easier.',
     long_description=long_description,
+    install_requires=requires,
 )
