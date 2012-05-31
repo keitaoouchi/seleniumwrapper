@@ -2,6 +2,8 @@ About this module
 -----------------
 selenium webdriver wrapper to make manipulation easier.
 
+.. image:: https://secure.travis-ci.org/keitaoouchi/seleniumwrapper.png
+
 Features
 --------
 
