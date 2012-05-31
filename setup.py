@@ -22,7 +22,7 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules'
 ]
 
-requires = ['selenium>=2.22.1', 'nose']
+requires = ['selenium>=2.22.1']
 
 setup(
     author='Keita Oouchi',
