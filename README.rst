@@ -88,6 +88,15 @@ SeleniumWrapper
 
         >>> br.current_url
 
+* timeout
+    Accessor for _timeout property.
+
+        >>> br.timeout
+        5
+        >>> br.timeout = 10
+        >>> br.timeout
+        10
+
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable::
 
@@ -184,6 +193,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.3.4
+    * Fixed to be able to change default timeout.
 * 0.3.3
     * Fixed bugs of string formatting.
 * 0.3.2
