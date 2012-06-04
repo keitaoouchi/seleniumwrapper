@@ -93,6 +93,7 @@ class SeleniumWrapper(object):
     def __init__(self, driver):
         if _is_wrappable(driver):
             self._driver = driver
+            self._timeout = 5
         else:
             msg = "2nd argument should be an instance of WebDriver or WebElement. given {0}.".format(type(driver))
             raise TypeError(msg)
@@ -104,7 +105,7 @@ class SeleniumWrapper(object):
     @property
     def parent(self):
         if isinstance(self._driver, WebElement):
-            return self.xpath("./parent::node()", timeout=2)
+            return self.xpath("./parent::node()", timeout=self._timeout)
         else:
             raise AttributeError("'WebDriver' object has no attribute 'parent'")
 
@@ -116,16 +117,24 @@ class SeleniumWrapper(object):
 
     @property
     def alert(self):
-        timeout = time.time() + 2
+        timeout = time.time() + self._timeout
         while time.time() < timeout:
             try:
                 alert = self._driver.switch_to_alert()
                 alert.text
                 return alert
             except NoAlertPresentException:
-                time.sleep(0.1)
+                time.sleep(0.2)
         msg = "Wait for alert to be displayed for 2 seconds, but it was not displayed."
         raise NoAlertPresentException(msg)
+
+    def _settimeout(self, timeout):
+        self._timeout = timeout
+
+    def _gettimeout(self):
+        return self._timeout
+
+    timeout = property(_gettimeout, _settimeout)
 
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)
@@ -136,7 +145,7 @@ class SeleniumWrapper(object):
 
     @property
     def current_url(self):
-        self.by_tag("body", 1)
+        self.by_tag("body", self._timeout)
         return self._driver.current_url
 
     def _is_selectable(self):
@@ -195,20 +204,22 @@ class SeleniumWrapper(object):
         dumped = " ".join(["{k}:{v}".format(k=k, v=info[k]) for k in info])
         return dumped
 
-    def click(self, timeout=3, presleep=0, postsleep=0):
+    def click(self, timeout=None, presleep=0, postsleep=0):
+        timeout = timeout or self._timeout
         if isinstance(self._driver, WebElement):
             try:
                 if presleep:
                     time.sleep(presleep)
                 self._wait_until_stopping(timeout, 0.1)
-                self._wait_until_displayed(timeout, 0.2)
+                self._wait_until_displayed(timeout, 0.3)
                 self._wait_until_clickable(timeout, 0.3)
                 if postsleep:
                     time.sleep(postsleep)
             except Exception as e:
                 raise e
 
-    def waitfor(self, type, target, eager=False, timeout=3):
+    def waitfor(self, type, target, eager=False, timeout=None):
+        timeout = timeout or self._timeout
         if eager:
             types = {"id":lambda d: d.find_elements_by_id(target),
                      "name":lambda d: d.find_elements_by_name(target),
@@ -242,44 +253,44 @@ class SeleniumWrapper(object):
             msg = "".join(template).format(sec=timeout, type=type, target=target)
             raise NoSuchElementException(msg)
 
-    def xpath(self, target, eager=False, timeout=3):
+    def xpath(self, target, eager=False, timeout=None):
         return self.waitfor("xpath", target, eager, timeout)
 
-    def css(self, target, eager=False, timeout=3):
+    def css(self, target, eager=False, timeout=None):
         return self.waitfor("css", target, eager, timeout)
 
-    def by_tag(self, tag, eager=False, timeout=3, **attributes):
+    def by_tag(self, tag, eager=False, timeout=None, **attributes):
         subjects = ["@{key}='{val}'".format(key=k, val=attributes[k]) for k in attributes]
         subject = " and ".join(subjects)
         xpath = ".//{tag}[{subject}]".format(tag=tag, subject=subject) if subject else ".//{tag}".format(tag=tag)
         return self.waitfor('xpath', xpath, eager, timeout)
 
-    def by_text(self, text, tag="*", partial=False, eager=False, timeout=3):
+    def by_text(self, text, tag="*", partial=False, eager=False, timeout=None):
         if partial:
             return self.xpath(".//{tag}[contains(text(), '{text}')]".format(tag=tag, text=text), eager, timeout)
         return self.xpath(".//{tag}[text()='{text}']".format(tag=tag, text=text), eager, timeout)
 
-    def by_class(self, target, eager=False, timeout=3):
+    def by_class(self, target, eager=False, timeout=None):
         return self.waitfor("class", target, eager, timeout)
 
-    def by_id(self, target, eager=False, timeout=3):
+    def by_id(self, target, eager=False, timeout=None):
         return self.waitfor("id", target, eager, timeout)
 
-    def by_name(self, target, eager=False, timeout=3):
+    def by_name(self, target, eager=False, timeout=None):
         return self.waitfor("name", target, eager, timeout)
 
-    def by_linktxt(self, target, eager=False, timeout=3, partial=False):
+    def by_linktxt(self, target, eager=False, timeout=None, partial=False):
         if partial:
-            return self.waitfor("partial_link_text", target, eager, timeout=3)
+            return self.waitfor("partial_link_text", target, eager, timeout=None)
         else:
             return self.waitfor("link_text", target, eager, timeout)
 
-    def href(self, partialurl=None, eager=False, timeout=3):
+    def href(self, partialurl=None, eager=False, timeout=None):
         if partialurl:
             return self.xpath(".//a[contains(@href, '{0}')]".format(partialurl), eager, timeout)
         return self.xpath(".//a", eager, timeout)
 
-    def img(self, alt=None, ext=None, eager=False, timeout=3):
+    def img(self, alt=None, ext=None, eager=False, timeout=None):
         options = []
         if alt:
             options.append("@alt='{0}'".format(alt))
@@ -289,18 +300,18 @@ class SeleniumWrapper(object):
         xpath = ".//img" + "[{0}]".format(option) if option else ".//img"
         return self.xpath(xpath, eager, timeout)
 
-    def button(self, value, eager=False, timeout=3):
+    def button(self, value, eager=False, timeout=None):
         return self.xpath("//input[@type='submit' or @type='button' and @value='{0}']".format(value), eager, timeout)
 
-    def checkbox(self, eager=False, timeout=3, **attributes):
+    def checkbox(self, eager=False, timeout=None, **attributes):
         attributes["type"] = "checkbox"
         return self.by_tag("input", eager, timeout, **attributes)
 
-    def radio(self, eager=False, timeout=3, **attributes):
+    def radio(self, eager=False, timeout=None, **attributes):
         attributes["type"] = "radio"
         return self.by_tag("input", eager, timeout, **attributes)
 
-    def select(self, eager=False, timeout=3, **attributes):
+    def select(self, eager=False, timeout=None, **attributes):
         selected = self.by_tag("select", eager, timeout, **attributes)
         if isinstance(selected, SeleniumWrapper) and selected._is_selectable():
             return Select(selected.unwrap)
