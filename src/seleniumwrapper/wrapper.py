@@ -129,7 +129,10 @@ class SeleniumWrapper(object):
         raise NoAlertPresentException(msg)
 
     def _settimeout(self, timeout):
-        self._timeout = timeout
+        if isinstance(timeout, int):
+            self._timeout = timeout
+        else:
+            raise AttributeError('int please.')
 
     def _gettimeout(self):
         return self._timeout
