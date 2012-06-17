@@ -78,6 +78,15 @@ SeleniumWrapper
 
         >>> price = br.by_tag("th", "Price").parent.by_tag("td").text
 
+* to_select
+    Convert wrapped WebElement to raw Select object::
+
+        >>> br.by_id('select_button').to_select.select_by_visible_text("hoge")
+
+        select method returns the same as below::
+
+        >>> br.select(id = 'select_button).select_by_visible_text("hoge")
+
 * alert
     Returns Alert(switch_to_alert()) object::
 
