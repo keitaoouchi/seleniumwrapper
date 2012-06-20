@@ -354,6 +354,10 @@ class SeleniumContainerWrapper(object):
         key = key.unwrap if isinstance(key, SeleniumWrapper) else key
         return key in self._iterable
 
+    @property
+    def size(self):
+        return len(self._iterable)
+
     def sample(self, size):
         picked = random.sample(self._iterable, size)
         if isinstance(picked, collections.Sequence):
