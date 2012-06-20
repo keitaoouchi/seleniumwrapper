@@ -20,7 +20,7 @@ class TestSeleniumWrapperFactory(unittest.TestCase):
         self.assertRaises(TypeError, seleniumwrapper.connect, 1, "http://somethings:9999/wd/hub")
         self.assertRaises(TypeError, seleniumwrapper.connect, "android", 1)
 
-    def test_fuctory_functions_raise_valueerror_if_invalid_drivername_is_given(self):
+    def test_factory_functions_raise_valueerror_if_invalid_drivername_is_given(self):
         self.assertRaises(ValueError, seleniumwrapper.create, 'Chorome')
         self.assertRaises(ValueError, seleniumwrapper.create, 'Firedog')
         self.assertRaises(ValueError, seleniumwrapper.connect, 'Chorome', "http://localhost:8080/wd/hub")
@@ -162,7 +162,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
 
-    def test_aliases_work_collectly(self):
+    def test_aliases_work_correctly(self):
         mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
         self.mock.find_element_by_css_selector.return_value = mock_elem
@@ -199,4 +199,5 @@ def suite():
     return suite
 
 if __name__ == "__main__":
-    suite()
+    s = suite()
+    unittest.TextTestRunner(verbosity=2).run(s)
