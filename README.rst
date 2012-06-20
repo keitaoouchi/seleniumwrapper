@@ -83,7 +83,7 @@ SeleniumWrapper
 
         >>> br.by_id('select_button').to_select.select_by_visible_text("hoge")
 
-        select method returns the same as below::
+    select method returns the same as below::
 
         >>> br.select(id = 'select_button).select_by_visible_text("hoge")
 
@@ -190,6 +190,11 @@ SeleniumWrapper
 SeleniumContainerWrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+* size
+    Returns length of wrapped iterable::
+
+        >>> br.img(eager=True).size
+
 * sample(size)
     Returns random.sample(self._iterable, size)::
 
@@ -203,6 +208,7 @@ SeleniumContainerWrapper
 Recent Change
 -------------
 * 0.3.4
+    * Add size property to SeleniumContainerWrapper
     * Fixed to be able to change default timeout.
 * 0.3.3
     * Fixed bugs of string formatting.
