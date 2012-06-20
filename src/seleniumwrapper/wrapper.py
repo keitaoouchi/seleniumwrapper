@@ -304,7 +304,7 @@ class SeleniumWrapper(object):
         return self.xpath(xpath, eager, timeout)
 
     def button(self, value, eager=False, timeout=None):
-        return self.xpath("//input[@type='submit' or @type='button' and @value='{0}']".format(value), eager, timeout)
+        return self.xpath(".//input[@type='submit' or @type='button' and @value='{0}']".format(value), eager, timeout)
 
     def checkbox(self, eager=False, timeout=None, **attributes):
         attributes["type"] = "checkbox"
