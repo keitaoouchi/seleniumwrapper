@@ -68,7 +68,7 @@ If current page doesn't load jquery, you can load your local jquery by hand::
 
     >>> br.load_js("/path/to/your/local/jquery.js")
 
-  or::
+or::
 
     >>> br.load_js(StringIO.StringIO("/path/to/your/local/jquery.js")
 
@@ -99,7 +99,7 @@ SeleniumWrapper
 
         >>> br.by_id('select_button').to_select.select_by_visible_text("hoge")
 
-        select method returns the same as below::
+    select method returns the same as below::
 
         >>> br.select(id = 'select_button).select_by_visible_text("hoge")
 

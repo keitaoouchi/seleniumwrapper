@@ -232,11 +232,11 @@ class SeleniumWrapper(object):
             library = path_or_file.read()
             self._driver.execute_script(library)
         else:
-            raise AttributeError('Given argument is not both file or /path/to/file:: {}'.format(str(path_or_file)))
+            raise AttributeError('Given argument is not both file or /path/to/file:: {0}'.format(str(path_or_file)))
 
     def jquery(self, target):
         """Returns SeleniumContainerWrapper if any elements is found."""
-        script = 'return $("{}")'.format(target)
+        script = 'return $("{0}")'.format(target)
         result = self._driver.execute_script(script)
         if result:
             if isinstance(result, collections.Sequence):
@@ -244,7 +244,7 @@ class SeleniumWrapper(object):
             else:
                 return SeleniumWrapper(result)
         else:
-            raise NoSuchElementException("Target {} not found.".format(target))
+            raise NoSuchElementException("Target {0} not found.".format(target))
 
     def script(self, javascript, *args):
         """Synchronously execute given javascript."""
