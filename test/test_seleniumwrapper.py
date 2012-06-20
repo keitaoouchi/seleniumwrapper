@@ -5,6 +5,7 @@ if sys.version < '2.7':
 else:
     import unittest
 import mock
+import StringIO
 import seleniumwrapper
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -20,7 +21,7 @@ class TestSeleniumWrapperFactory(unittest.TestCase):
         self.assertRaises(TypeError, seleniumwrapper.connect, 1, "http://somethings:9999/wd/hub")
         self.assertRaises(TypeError, seleniumwrapper.connect, "android", 1)
 
-    def test_fuctory_functions_raise_valueerror_if_invalid_drivername_is_given(self):
+    def test_factory_functions_raise_valueerror_if_invalid_drivername_is_given(self):
         self.assertRaises(ValueError, seleniumwrapper.create, 'Chorome')
         self.assertRaises(ValueError, seleniumwrapper.create, 'Firedog')
         self.assertRaises(ValueError, seleniumwrapper.connect, 'Chorome', "http://localhost:8080/wd/hub")
@@ -162,7 +163,7 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
 
-    def test_aliases_work_collectly(self):
+    def test_aliases_work_correctly(self):
         mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
         self.mock.find_element_by_css_selector.return_value = mock_elem
@@ -192,11 +193,44 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         wrapper = SeleniumWrapper(wrapped_elem)
         self.assertIsInstance(wrapper.parent, SeleniumWrapper)
 
+class TestSeleniumWrapperJavascriptSupport(unittest.TestCase):
+
+    def setUp(self):
+        mocky = mock.Mock(WebDriver)
+        self.mock = mocky
+
+    def test_load_js_raise_if_given_argument_is_not_both_file_like_obj_or_path_to_file(self):
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertRaises(AttributeError, wrapper.load_js, "/path/not/exists")
+        self.assertRaises(AttributeError, wrapper.load_js, 1)
+
+    def test_load_js_load_string_from_StringIO_because_it_respond_to_read_method(self):
+        f = StringIO.StringIO('hoge')
+        wrapper = SeleniumWrapper(self.mock)
+        wrapper.load_js(f)
+        self.mock.execute_script.assert_called_once_with('hoge')
+
+    def test_script_returns_if_something_is_returned_by_execute_script(self):
+        self.mock.execute_script.return_value = [mock.Mock(WebElement)]
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertIsInstance(wrapper.script('fuga'), SeleniumContainerWrapper)
+        self.mock.execute_script.return_value = mock.Mock(WebElement)
+        self.assertIsInstance(wrapper.script('fuga'), SeleniumWrapper)
+        self.mock.execute_script.return_value = None
+        self.assertIsNone(wrapper.script('fuga'))
+
+    def test_jquery_raise_if_nothing_found(self):
+        self.mock.execute_script.return_value = None
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertRaises(NoSuchElementException, wrapper.jquery, 'hoge')
+
 def suite():
     suite = unittest.TestSuite()
-    suite.addTests(unittest.makeSuite(TestSeleniumWrapperAliases))
-    suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
+    #suite.addTests(unittest.makeSuite(TestSeleniumWrapperAliases))
+    #suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapperJavascriptSupport))
     return suite
 
 if __name__ == "__main__":
-    suite()
+    s = suite()
+    unittest.TextTestRunner(verbosity=2).run(s)
