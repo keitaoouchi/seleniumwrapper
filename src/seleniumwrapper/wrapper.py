@@ -236,7 +236,7 @@ class SeleniumWrapper(object):
 
     def jquery(self, target):
         """Returns SeleniumContainerWrapper if any elements is found."""
-        script = 'return $("{}");'.format(target)
+        script = 'return $("{}")'.format(target)
         result = self._driver.execute_script(script)
         if result:
             if isinstance(result, collections.Sequence):
