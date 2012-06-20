@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import collections
 import inspect
 import time
@@ -221,6 +222,39 @@ class SeleniumWrapper(object):
             except Exception as e:
                 raise e
 
+    def load_js(self, path_or_file):
+        """Load javascript from /path/to/file or file like object that responds to 'read' method."""
+        if isinstance(path_or_file, str) and os.path.isfile(path_or_file):
+            with open(path_or_file, 'r') as f:
+                library = f.read()
+                self._driver.execute_script(library)
+        elif hasattr(path_or_file, 'read'):
+            library = path_or_file.read()
+            self._driver.execute_script(library)
+        else:
+            raise AttributeError('Given argument is not both file or /path/to/file:: {}'.format(str(path_or_file)))
+
+    def jquery(self, target):
+        """Returns SeleniumContainerWrapper if any elements is found."""
+        script = 'return $("{}");'.format(target)
+        result = self._driver.execute_script(script)
+        if result:
+            if isinstance(result, collections.Sequence):
+                return SeleniumContainerWrapper(result)
+            else:
+                return SeleniumWrapper(result)
+        else:
+            raise NoSuchElementException("Target {} not found.".format(target))
+
+    def script(self, javascript, *args):
+        """Synchronously execute given javascript."""
+        result = self._driver.execute_script(javascript, *args)
+        if result:
+            if isinstance(result, collections.Sequence):
+                return SeleniumContainerWrapper(result)
+            else:
+                return SeleniumWrapper(result)
+
     def waitfor(self, type, target, eager=False, timeout=None):
         timeout = timeout or self._timeout
         if eager:
@@ -353,6 +387,10 @@ class SeleniumContainerWrapper(object):
     def __contains__(self, key):
         key = key.unwrap if isinstance(key, SeleniumWrapper) else key
         return key in self._iterable
+
+    @property
+    def size(self):
+        return len(self._iterable)
 
     def sample(self, size):
         picked = random.sample(self._iterable, size)
