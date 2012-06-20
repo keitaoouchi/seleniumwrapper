@@ -60,6 +60,22 @@ Each contents in SeleniumContainerWrapper also SeleniumWrapper::
 
     >>> tds = [tr.xpath("//td", eager=True) for tr in br.xpath("//tr", eager=True)]
 
+If current page already load jquery.js, you can find elements by JQuery selector::
+
+    >>> buttons = br.jquery('#hoge .fuga li:even')
+
+If current page doesn't load jquery, you can load your local jquery by hand::
+
+    >>> br.load_js("/path/to/your/local/jquery.js")
+
+or::
+
+    >>> br.load_js(StringIO.StringIO("/path/to/your/local/jquery.js")
+
+You can execute javascript by invoking **script** method::
+
+    >>> br.script('alert("hoge")')
+
 Basic API
 ---------
 * seleniumwrapper.create(drivername)
@@ -110,6 +126,21 @@ SeleniumWrapper
     Continue to polling until timeout or element is displayed and clickable::
 
         >>> br.button("Send").click()
+
+* load_js(path_or_file)
+    Load javascript from /path/to/file or file like object that responds to 'read' method::
+
+        >>> br.load_js("/path/to/jquery.js")
+
+* jquery(target)
+    Find elements by jquery selector::
+
+        >>> br.jquery('#hoge .fuga li:even')
+
+* script(javascript)
+    Execute given javascript::
+
+        >>> br.script('alert("hoge")')
 
 * waitfor(type, target, eager=False, timeout=3)
     See source::
@@ -208,6 +239,7 @@ SeleniumContainerWrapper
 Recent Change
 -------------
 * 0.3.4
+    * Add javascript support(**load_js**, **jquery**, **script** methods). -- *UNSTABLE* --
     * Add size property to SeleniumContainerWrapper
     * Fixed to be able to change default timeout.
 * 0.3.3
