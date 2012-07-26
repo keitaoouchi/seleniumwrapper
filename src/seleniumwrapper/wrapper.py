@@ -168,7 +168,7 @@ class SeleniumWrapper(object):
             else:
                 time.sleep(interval)
         if not self._is_stopping(interval):
-            raise WebDriverException("Element is not stably displayed for {sec} seconds.".format(sec=timeout))
+            raise WebDriverException("Element was not stably displayed for {sec} seconds.".format(sec=timeout))
 
     def _wait_until_clickable(self, timeout, interval):
         err_messages = []
@@ -182,7 +182,7 @@ class SeleniumWrapper(object):
             time.sleep(interval)
             if (time.time() > endtime):
                 if err_messages:
-                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
+                    template = ("Waited for element to be clickable for {sec} seconds, ",
                                 "but clicked other elements. {err}")
                     msg = "".join(template).format(sec=timeout, err=err_messages)
                     raise WebDriverException(msg)
@@ -191,7 +191,7 @@ class SeleniumWrapper(object):
         try:
             WebDriverWait(self._driver, timeout, interval).until(lambda d: d.is_displayed())
         except TimeoutException:
-            template = ("Wait for elemtent to be displayed for {sec} seconds, ",
+            template = ("Waited for element to be displayed for {sec} seconds, ",
                         "but <{target} ...> was not displayed:: <{dumped}>")
             msg = "".join(template).format(sec=timeout, target=self._driver.tag_name, dumped=self._dump())
             raise ElementNotVisibleException(msg)
@@ -251,7 +251,7 @@ class SeleniumWrapper(object):
             else:
                 return result
         except TimeoutException:
-            template = ("Wait for elemtent to appear for {sec} seconds, ",
+            template = ("Waited for element to appear for {sec} seconds, ",
                         "but {type}:{target} didn't appear.")
             msg = "".join(template).format(sec=timeout, type=type, target=target)
             raise NoSuchElementException(msg)
@@ -323,7 +323,7 @@ class SeleniumWrapper(object):
             selected._iterable = [Select(element) for element in iterable if element.tag_name == 'select']
             return selected
         else:
-            template = ("Wait for elemtent to appear for {sec} seconds, ",
+            template = ("Waited for element to appear for {sec} seconds, ",
                         "but select:{attr} didn't appear.")
             msg = "".join(template).format(sec=timeout, attr=attributes)
             raise NoSuchElementException(msg)
