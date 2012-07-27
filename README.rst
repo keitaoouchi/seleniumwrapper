@@ -106,6 +106,11 @@ SeleniumWrapper
         >>> br.timeout
         10
 
+* attr(name)
+    Shortcut to get_attribute::
+
+        >>> br.attr('href')
+
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable::
 
@@ -207,27 +212,30 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.3.5
+    * Added **attr** method.
+    * Fixed some typos.
 * 0.3.4
-    * Add size property to SeleniumContainerWrapper
+    * Added size property to SeleniumContainerWrapper
     * Fixed to be able to change default timeout.
 * 0.3.3
     * Fixed bugs of string formatting.
 * 0.3.2
-    * Change **alert** to wait until Alert's text is accesible.
+    * Changed **alert** to wait until Alert's text is accesible.
     * Override **current_url** to wait for page body loaded.
 * 0.3.1
-    * Add **connect** functon.
+    * Added **connect** functon.
 * 0.3.0
-    * Change **tag** method to **by_tag**.
-    * Add **checkbox**, **radio**.
-    * Change **select** property to method.
-    * Add **sample**, **choice** methods to SeleniumContainerWrapper.
-    * Fix **click** bug.
+    * Changed **tag** method to **by_tag**.
+    * Added **checkbox**, **radio**.
+    * Changed **select** property to method.
+    * Added **sample**, **choice** methods to SeleniumContainerWrapper.
+    * Fixed **click** bug.
 * 0.2.4
-    * Fix bug.
+    * Fixed bug.
 * 0.2.3
-    * Add ext argument to **img** (alt and ext are both optional.)
+    * Added ext argument to **img** (alt and ext are both optional.)
 * 0.2.2
-    * Add new property **alert**
-    * Change **img**'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
-    * Modify SeleniumContainerWrapper's __contains__ behavior to unwrap given object if it is a SeleniumWrapper.
+    * Added new property **alert**
+    * Changed **img**'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
+    * Modified SeleniumContainerWrapper's __contains__ behavior to unwrap given object if it is a SeleniumWrapper.

@@ -11,7 +11,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwrapper.wrapper import SeleniumWrapper
 from seleniumwrapper.wrapper import SeleniumContainerWrapper
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException, ElementNotVisibleException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException, ElementNotVisibleException
 
 class TestSeleniumWrapperFactory(unittest.TestCase):
 
@@ -161,6 +161,16 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         self.mock.find_elements_by_xpath.return_value = [mock_elem]
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
+
+    def test_attr_raise_if_invoked_from_webdriver_wrapped_object(self):
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertRaises(AttributeError, wrapper.attr, 'hoge')
+
+    def test_attr_invoke_get_attribute_if_invoked_from_webelement_wrapped(self):
+        mock_elem = mock.Mock(WebElement)
+        mock_elem.get_attribute.return_value = True
+        wrapped = SeleniumWrapper(mock_elem)
+        self.assertTrue(wrapped.attr('hoge'))
 
     def test_aliases_work_correctly(self):
         mock_elem = mock.Mock(WebElement)

@@ -50,7 +50,7 @@ def connect(drivername, executor, custom_capabilities=None, **kwargs):
                     'android': DesiredCapabilities.ANDROID}
     dname = drivername.lower()
     if dname in capabilities:
-        capability = capabilities[drivername]
+        capability = capabilities[dname]
         custom_capabilities = custom_capabilities or {}
         for key in custom_capabilities:
             capability[key] = custom_capabilities[key]
@@ -92,7 +92,7 @@ class SeleniumWrapper(object):
 
     def __init__(self, driver):
         if _is_wrappable(driver):
-            self._driver = driver
+            self._wrapped = driver
             self._timeout = 5
         else:
             msg = "2nd argument should be an instance of WebDriver or WebElement. given {0}.".format(type(driver))
@@ -100,11 +100,11 @@ class SeleniumWrapper(object):
 
     @property
     def unwrap(self):
-        return self._driver
+        return self._wrapped
 
     @property
     def parent(self):
-        if isinstance(self._driver, WebElement):
+        if isinstance(self._wrapped, WebElement):
             return self.xpath("./parent::node()", timeout=self._timeout)
         else:
             raise AttributeError("'WebDriver' object has no attribute 'parent'")
@@ -120,7 +120,7 @@ class SeleniumWrapper(object):
         timeout = time.time() + self._timeout
         while time.time() < timeout:
             try:
-                alert = self._driver.switch_to_alert()
+                alert = self._wrapped.switch_to_alert()
                 alert.text
                 return alert
             except NoAlertPresentException:
@@ -144,20 +144,20 @@ class SeleniumWrapper(object):
 
     @_chainreact
     def __getattr__(self, name):
-        return self._driver, getattr(self._driver, name)
+        return self._wrapped, getattr(self._wrapped, name)
 
     @property
     def current_url(self):
         self.by_tag("body", self._timeout)
-        return self._driver.current_url
+        return self._wrapped.current_url
 
     def _is_selectable(self):
         return self.unwrap.tag_name == 'select'
 
     def _is_stopping(self, interval):
-        before = (self._driver.location['x'], self._driver.location['y'])
+        before = (self._wrapped.location['x'], self._wrapped.location['y'])
         time.sleep(interval)
-        after = (self._driver.location['x'], self._driver.location['y'])
+        after = (self._wrapped.location['x'], self._wrapped.location['y'])
         return before[0] == after[0] and before[1] == after[1]
 
     def _wait_until_stopping(self, timeout, interval):
@@ -175,7 +175,7 @@ class SeleniumWrapper(object):
         endtime = time.time() + timeout
         while True:
             try:
-                self._driver.click()
+                self._wrapped.click()
                 break
             except WebDriverException as e:
                 err_messages.append(e.msg.split(":")[-1].strip())
@@ -189,15 +189,15 @@ class SeleniumWrapper(object):
 
     def _wait_until_displayed(self, timeout, interval):
         try:
-            WebDriverWait(self._driver, timeout, interval).until(lambda d: d.is_displayed())
+            WebDriverWait(self._wrapped, timeout, interval).until(lambda d: d.is_displayed())
         except TimeoutException:
             template = ("Waited for element to be displayed for {sec} seconds, ",
                         "but <{target} ...> was not displayed:: <{dumped}>")
-            msg = "".join(template).format(sec=timeout, target=self._driver.tag_name, dumped=self._dump())
+            msg = "".join(template).format(sec=timeout, target=self._wrapped.tag_name, dumped=self._dump())
             raise ElementNotVisibleException(msg)
 
     def _dump(self):
-        element = self._driver
+        element = self._wrapped
         info = {"visibility": element.value_of_css_property("visibility"),
                 "display": element.value_of_css_property("display"),
                 "height": element.value_of_css_property("height"),
@@ -207,9 +207,15 @@ class SeleniumWrapper(object):
         dumped = " ".join(["{k}:{v}".format(k=k, v=info[k]) for k in info])
         return dumped
 
+    def attr(self, name):
+        if isinstance(self._wrapped, WebElement):
+            return self._wrapped.get_attribute(name)
+        else:
+            raise AttributeError("This is WebDriver wrapped element.")
+
     def click(self, timeout=None, presleep=0, postsleep=0):
         timeout = timeout or self._timeout
-        if isinstance(self._driver, WebElement):
+        if isinstance(self._wrapped, WebElement):
             try:
                 if presleep:
                     time.sleep(presleep)
@@ -243,7 +249,7 @@ class SeleniumWrapper(object):
                      "css":lambda d: d.find_element_by_css_selector(target), }
         finder = types[type]
         try:
-            result = WebDriverWait(self._driver, timeout).until(finder)
+            result = WebDriverWait(self._wrapped, timeout).until(finder)
             if eager and len(result):
                 return SeleniumContainerWrapper(result)
             elif _is_wrappable(result):
