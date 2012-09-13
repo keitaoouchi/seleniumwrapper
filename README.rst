@@ -132,21 +132,6 @@ SeleniumWrapper
 
         >>> br.button("Send").click()
 
-* load_js(path_or_file)
-    Load javascript from /path/to/file or file like object that responds to 'read' method::
-
-        >>> br.load_js("/path/to/jquery.js")
-
-* jquery(target)
-    Find elements by jquery selector::
-
-        >>> br.jquery('#hoge .fuga li:even')
-
-* script(javascript)
-    Execute given javascript::
-
-        >>> br.script('alert("hoge")')
-
 * scroll_to(x, y)
     equivalent to javascript's scrollTo::
 
@@ -265,8 +250,6 @@ Recent Change
 -------------
 * 0.4.0
     * Added **scroll_to**, **scroll_by**, **scroll_into_view** methods.
-    * Added **jquery** method to support jquery selecter.
-    * Added **load_js**, **script** methods.
 * 0.3.5
     * Added **attr** method.
     * Fixed some typos.

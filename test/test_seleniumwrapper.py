@@ -209,31 +209,6 @@ class TestSeleniumWrapperJavascriptSupport(unittest.TestCase):
         mocky = mock.Mock(WebDriver)
         self.mock = mocky
 
-    def test_load_js_raise_if_given_argument_is_not_both_file_like_obj_or_path_to_file(self):
-        wrapper = SeleniumWrapper(self.mock)
-        self.assertRaises(AttributeError, wrapper.load_js, "/path/not/exists")
-        self.assertRaises(AttributeError, wrapper.load_js, 1)
-
-    def test_load_js_load_string_from_StringIO_because_it_respond_to_read_method(self):
-        f = StringIO.StringIO('hoge')
-        wrapper = SeleniumWrapper(self.mock)
-        wrapper.load_js(f)
-        self.mock.execute_script.assert_called_once_with('hoge')
-
-    def test_script_returns_if_something_is_returned_by_execute_script(self):
-        self.mock.execute_script.return_value = [mock.Mock(WebElement)]
-        wrapper = SeleniumWrapper(self.mock)
-        self.assertIsInstance(wrapper.script('fuga'), SeleniumContainerWrapper)
-        self.mock.execute_script.return_value = mock.Mock(WebElement)
-        self.assertIsInstance(wrapper.script('fuga'), SeleniumWrapper)
-        self.mock.execute_script.return_value = None
-        self.assertIsNone(wrapper.script('fuga'))
-
-    def test_jquery_raise_if_nothing_found(self):
-        self.mock.execute_script.return_value = None
-        wrapper = SeleniumWrapper(self.mock)
-        self.assertRaises(NoSuchElementException, wrapper.jquery, 'hoge')
-
     def test_scroll_methods_raise_if_wrapped_is_not_webdriver(self):
         wrapper = SeleniumWrapper(mock.Mock(WebElement))
         self.assertRaises(AttributeError, wrapper.scroll_to, *[10, 10])

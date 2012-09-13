@@ -234,39 +234,6 @@ class SeleniumWrapper(object):
             except Exception as e:
                 raise e
 
-    def load_js(self, path_or_file):
-        """Load javascript from /path/to/file or file like object that responds to 'read' method."""
-        if isinstance(path_or_file, str) and os.path.isfile(path_or_file):
-            with open(path_or_file, 'r') as f:
-                library = f.read()
-                self._wrapped.execute_script(library)
-        elif hasattr(path_or_file, 'read'):
-            library = path_or_file.read()
-            self._wrapped.execute_script(library)
-        else:
-            raise AttributeError('Given argument is not both file or /path/to/file:: {0}'.format(str(path_or_file)))
-
-    def jquery(self, target):
-        """Returns SeleniumContainerWrapper if any elements is found."""
-        script = "try{{return $('{0}');}}catch(e){{}}".format(target)
-        result = self._wrapped.execute_script(script)
-        if result:
-            if isinstance(result, collections.Sequence):
-                return SeleniumContainerWrapper(result)
-            else:
-                return SeleniumWrapper(result)
-        else:
-            raise NoSuchElementException("Target {0} not found.".format(target))
-
-    def script(self, javascript, *args):
-        """Synchronously execute given javascript."""
-        result = self._wrapped.execute_script(javascript, *args)
-        if result:
-            if isinstance(result, collections.Sequence):
-                return SeleniumContainerWrapper(result)
-            else:
-                return SeleniumWrapper(result)
-
     def scroll_to(self, x, y):
         if isinstance(self._wrapped, WebDriver):
             return self._wrapped.execute_script("window.scrollTo({:d}, {:d})".format(x, y))
