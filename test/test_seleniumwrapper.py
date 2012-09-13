@@ -12,7 +12,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwrapper.wrapper import SeleniumWrapper
 from seleniumwrapper.wrapper import SeleniumContainerWrapper
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException, ElementNotVisibleException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException, ElementNotVisibleException
 
 class TestSeleniumWrapperFactory(unittest.TestCase):
 
@@ -163,6 +163,16 @@ class TestSeleniumWrapperAliases(unittest.TestCase):
         wrapper = SeleniumWrapper(self.mock)
         self.assertIsInstance(wrapper.waitfor("xpath", "dummy", eager=True), SeleniumContainerWrapper)
 
+    def test_attr_raise_if_invoked_from_webdriver_wrapped_object(self):
+        wrapper = SeleniumWrapper(self.mock)
+        self.assertRaises(AttributeError, wrapper.attr, 'hoge')
+
+    def test_attr_invoke_get_attribute_if_invoked_from_webelement_wrapped(self):
+        mock_elem = mock.Mock(WebElement)
+        mock_elem.get_attribute.return_value = True
+        wrapped = SeleniumWrapper(mock_elem)
+        self.assertTrue(wrapped.attr('hoge'))
+
     def test_aliases_work_correctly(self):
         mock_elem = mock.Mock(WebElement)
         self.mock.find_element_by_xpath.return_value = mock_elem
@@ -224,10 +234,28 @@ class TestSeleniumWrapperJavascriptSupport(unittest.TestCase):
         wrapper = SeleniumWrapper(self.mock)
         self.assertRaises(NoSuchElementException, wrapper.jquery, 'hoge')
 
+    def test_scroll_methods_raise_if_wrapped_is_not_webdriver(self):
+        wrapper = SeleniumWrapper(mock.Mock(WebElement))
+        self.assertRaises(AttributeError, wrapper.scroll_to, *[10, 10])
+        self.assertRaises(AttributeError, wrapper.scroll_by, *[10, 10])
+        self.assertRaises(AttributeError, wrapper.scroll_into_view, '#hoge')
+
+    def test_scroll_into_view_raise_if_no_jquery_found(self):
+        wrapper = SeleniumWrapper(self.mock)
+        self.mock.execute_script.return_value = None
+        self.assertRaises(AttributeError, wrapper.scroll_into_view, '#hoge')
+
+    def test_scroll_into_view_execute_script_if_jquery_was_found(self):
+        wrapper = SeleniumWrapper(self.mock)
+        wrapper.scroll_into_view('#hoge')
+        calls = [mock.call.execute_script("try{return $;}catch(e){}"),
+                 mock.call.execute_script("try{$('#hoge') && $('#hoge')[0].scrollIntoView(true)}catch(e){}")]
+        self.mock.assert_has_calls(calls)
+
 def suite():
     suite = unittest.TestSuite()
-    #suite.addTests(unittest.makeSuite(TestSeleniumWrapperAliases))
-    #suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapperAliases))
+    suite.addTests(unittest.makeSuite(TestSeleniumWrapper))
     suite.addTests(unittest.makeSuite(TestSeleniumWrapperJavascriptSupport))
     return suite
 

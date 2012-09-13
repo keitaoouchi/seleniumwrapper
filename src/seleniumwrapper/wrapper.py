@@ -34,6 +34,7 @@ def create(drivername, *args, **kwargs):
         msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given {0}".format(drivername)
         raise ValueError(msg)
 
+
 def connect(drivername, executor, custom_capabilities=None, **kwargs):
     if not isinstance(drivername, str):
         msg = "drivername should be an instance of string. given {0}".format(type(drivername))
@@ -51,7 +52,7 @@ def connect(drivername, executor, custom_capabilities=None, **kwargs):
                     'android': DesiredCapabilities.ANDROID}
     dname = drivername.lower()
     if dname in capabilities:
-        capability = capabilities[drivername]
+        capability = capabilities[dname]
         custom_capabilities = custom_capabilities or {}
         for key in custom_capabilities:
             capability[key] = custom_capabilities[key]
@@ -64,11 +65,13 @@ def connect(drivername, executor, custom_capabilities=None, **kwargs):
         msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given {0}".format(drivername)
         raise ValueError(msg)
 
+
 def _is_wrappable(obj):
     if isinstance(obj, WebDriver) or isinstance(obj, WebElement):
         return True
     else:
         return False
+
 
 def _chainreact(__getattr__):
     def containment(*methodname):
@@ -77,6 +80,7 @@ def _chainreact(__getattr__):
                 return SeleniumWrapper(obj)
             else:
                 return obj
+
         self, methodobj = __getattr__(*methodname)
         if inspect.isroutine(methodobj):
             def reaction(*realargs):
@@ -84,16 +88,18 @@ def _chainreact(__getattr__):
                 # for side-effective method(append, ...)
                 result = result if result is not None else self
                 return wrap_or_else(result)
+
             return reaction
         else:
             return wrap_or_else(methodobj)
+
     return containment
 
-class SeleniumWrapper(object):
 
+class SeleniumWrapper(object):
     def __init__(self, driver):
         if _is_wrappable(driver):
-            self._driver = driver
+            self._wrapped = driver
             self._timeout = 5
         else:
             msg = "2nd argument should be an instance of WebDriver or WebElement. given {0}.".format(type(driver))
@@ -101,11 +107,11 @@ class SeleniumWrapper(object):
 
     @property
     def unwrap(self):
-        return self._driver
+        return self._wrapped
 
     @property
     def parent(self):
-        if isinstance(self._driver, WebElement):
+        if isinstance(self._wrapped, WebElement):
             return self.xpath("./parent::node()", timeout=self._timeout)
         else:
             raise AttributeError("'WebDriver' object has no attribute 'parent'")
@@ -121,7 +127,7 @@ class SeleniumWrapper(object):
         timeout = time.time() + self._timeout
         while time.time() < timeout:
             try:
-                alert = self._driver.switch_to_alert()
+                alert = self._wrapped.switch_to_alert()
                 alert.text
                 return alert
             except NoAlertPresentException:
@@ -145,20 +151,20 @@ class SeleniumWrapper(object):
 
     @_chainreact
     def __getattr__(self, name):
-        return self._driver, getattr(self._driver, name)
+        return self._wrapped, getattr(self._wrapped, name)
 
     @property
     def current_url(self):
         self.by_tag("body", self._timeout)
-        return self._driver.current_url
+        return self._wrapped.current_url
 
     def _is_selectable(self):
         return self.unwrap.tag_name == 'select'
 
     def _is_stopping(self, interval):
-        before = (self._driver.location['x'], self._driver.location['y'])
+        before = (self._wrapped.location['x'], self._wrapped.location['y'])
         time.sleep(interval)
-        after = (self._driver.location['x'], self._driver.location['y'])
+        after = (self._wrapped.location['x'], self._wrapped.location['y'])
         return before[0] == after[0] and before[1] == after[1]
 
     def _wait_until_stopping(self, timeout, interval):
@@ -169,36 +175,36 @@ class SeleniumWrapper(object):
             else:
                 time.sleep(interval)
         if not self._is_stopping(interval):
-            raise WebDriverException("Element is not stably displayed for {sec} seconds.".format(sec=timeout))
+            raise WebDriverException("Element was not stably displayed for {sec} seconds.".format(sec=timeout))
 
     def _wait_until_clickable(self, timeout, interval):
         err_messages = []
         endtime = time.time() + timeout
         while True:
             try:
-                self._driver.click()
+                self._wrapped.click()
                 break
             except WebDriverException as e:
                 err_messages.append(e.msg.split(":")[-1].strip())
             time.sleep(interval)
             if (time.time() > endtime):
                 if err_messages:
-                    template = ("Wait for elemtent to be clickable for {sec} seconds, ",
+                    template = ("Waited for element to be clickable for {sec} seconds, ",
                                 "but clicked other elements. {err}")
                     msg = "".join(template).format(sec=timeout, err=err_messages)
                     raise WebDriverException(msg)
 
     def _wait_until_displayed(self, timeout, interval):
         try:
-            WebDriverWait(self._driver, timeout, interval).until(lambda d: d.is_displayed())
+            WebDriverWait(self._wrapped, timeout, interval).until(lambda d: d.is_displayed())
         except TimeoutException:
-            template = ("Wait for elemtent to be displayed for {sec} seconds, ",
+            template = ("Waited for element to be displayed for {sec} seconds, ",
                         "but <{target} ...> was not displayed:: <{dumped}>")
-            msg = "".join(template).format(sec=timeout, target=self._driver.tag_name, dumped=self._dump())
+            msg = "".join(template).format(sec=timeout, target=self._wrapped.tag_name, dumped=self._dump())
             raise ElementNotVisibleException(msg)
 
     def _dump(self):
-        element = self._driver
+        element = self._wrapped
         info = {"visibility": element.value_of_css_property("visibility"),
                 "display": element.value_of_css_property("display"),
                 "height": element.value_of_css_property("height"),
@@ -208,9 +214,15 @@ class SeleniumWrapper(object):
         dumped = " ".join(["{k}:{v}".format(k=k, v=info[k]) for k in info])
         return dumped
 
+    def attr(self, name):
+        if isinstance(self._wrapped, WebElement):
+            return self._wrapped.get_attribute(name)
+        else:
+            raise AttributeError("This is WebDriver wrapped object.")
+
     def click(self, timeout=None, presleep=0, postsleep=0):
         timeout = timeout or self._timeout
-        if isinstance(self._driver, WebElement):
+        if isinstance(self._wrapped, WebElement):
             try:
                 if presleep:
                     time.sleep(presleep)
@@ -227,17 +239,17 @@ class SeleniumWrapper(object):
         if isinstance(path_or_file, str) and os.path.isfile(path_or_file):
             with open(path_or_file, 'r') as f:
                 library = f.read()
-                self._driver.execute_script(library)
+                self._wrapped.execute_script(library)
         elif hasattr(path_or_file, 'read'):
             library = path_or_file.read()
-            self._driver.execute_script(library)
+            self._wrapped.execute_script(library)
         else:
             raise AttributeError('Given argument is not both file or /path/to/file:: {0}'.format(str(path_or_file)))
 
     def jquery(self, target):
         """Returns SeleniumContainerWrapper if any elements is found."""
-        script = 'return $("{0}")'.format(target)
-        result = self._driver.execute_script(script)
+        script = "try{{return $('{0}');}}catch(e){{}}".format(target)
+        result = self._wrapped.execute_script(script)
         if result:
             if isinstance(result, collections.Sequence):
                 return SeleniumContainerWrapper(result)
@@ -248,36 +260,59 @@ class SeleniumWrapper(object):
 
     def script(self, javascript, *args):
         """Synchronously execute given javascript."""
-        result = self._driver.execute_script(javascript, *args)
+        result = self._wrapped.execute_script(javascript, *args)
         if result:
             if isinstance(result, collections.Sequence):
                 return SeleniumContainerWrapper(result)
             else:
                 return SeleniumWrapper(result)
 
+    def scroll_to(self, x, y):
+        if isinstance(self._wrapped, WebDriver):
+            return self._wrapped.execute_script("window.scrollTo({:d}, {:d})".format(x, y))
+        else:
+            raise AttributeError("This is WebElement wrapped object.")
+
+    def scroll_by(self, x, y):
+        if isinstance(self._wrapped, WebDriver):
+            return self._wrapped.execute_script("window.scrollBy({:d}, {:d})".format(x, y))
+        else:
+            raise AttributeError("This is WebElement wrapped object.")
+
+    def scroll_into_view(self, jq_identifier, align_with_top=True):
+        if isinstance(self._wrapped, WebDriver):
+            if self._wrapped.execute_script("try{return $;}catch(e){}"):
+                script_template = "try{{$('{0}') && $('{0}')[0].scrollIntoView({1})}}catch(e){{}}"
+                script = script_template.format(jq_identifier, 'true' if align_with_top else 'false')
+                self._wrapped.execute_script(script)
+            else:
+                raise AttributeError("You must load jquery library.")
+        else:
+            raise AttributeError("This is WebElement wrapped object.")
+
     def waitfor(self, type, target, eager=False, timeout=None):
         timeout = timeout or self._timeout
         if eager:
-            types = {"id":lambda d: d.find_elements_by_id(target),
-                     "name":lambda d: d.find_elements_by_name(target),
-                     "xpath":lambda d: d.find_elements_by_xpath(target),
-                     "link_text":lambda d: d.find_elements_by_link_text(target),
-                     "partial_link_text":lambda d: d.find_elements_by_partial_link_text(target),
-                     "tag":lambda d: d.find_elements_by_tag_name(target),
-                     "class":lambda d: d.find_elements_by_class_name(target),
-                     "css":lambda d: d.find_elements_by_css_selector(target), }
+            types = {"id": lambda d: d.find_elements_by_id(target),
+                     "name": lambda d: d.find_elements_by_name(target),
+                     "xpath": lambda d: d.find_elements_by_xpath(target),
+                     "link_text": lambda d: d.find_elements_by_link_text(target),
+                     "partial_link_text": lambda d: d.find_elements_by_partial_link_text(target),
+                     "tag": lambda d: d.find_elements_by_tag_name(target),
+                     "class": lambda d: d.find_elements_by_class_name(target),
+                     "css": lambda d: d.find_elements_by_css_selector(target), }
         else:
-            types = {"id":lambda d: d.find_element_by_id(target),
-                     "name":lambda d: d.find_element_by_name(target),
-                     "xpath":lambda d: d.find_element_by_xpath(target),
-                     "link_text":lambda d: d.find_element_by_link_text(target),
-                     "partial_link_text":lambda d: d.find_element_by_partial_link_text(target),
-                     "tag":lambda d: d.find_element_by_tag_name(target),
-                     "class":lambda d: d.find_element_by_class_name(target),
-                     "css":lambda d: d.find_element_by_css_selector(target), }
+            types = {"id": lambda d: d.find_element_by_id(target),
+                     "name": lambda d: d.find_element_by_name(target),
+                     "xpath": lambda d: d.find_element_by_xpath(target),
+                     "link_text": lambda d: d.find_element_by_link_text(target),
+                     "partial_link_text": lambda d: d.find_element_by_partial_link_text(target),
+                     "tag": lambda d: d.find_element_by_tag_name(target),
+                     "class": lambda d: d.find_element_by_class_name(target),
+                     "css": lambda d: d.find_element_by_css_selector(target), }
         finder = types[type]
         try:
-            result = WebDriverWait(self._driver, timeout).until(finder)
+            result = WebDriverWait(self._wrapped, timeout).until(finder)
             if eager and len(result):
                 return SeleniumContainerWrapper(result)
             elif _is_wrappable(result):
@@ -285,7 +320,7 @@ class SeleniumWrapper(object):
             else:
                 return result
         except TimeoutException:
-            template = ("Wait for elemtent to appear for {sec} seconds, ",
+            template = ("Waited for element to appear for {sec} seconds, ",
                         "but {type}:{target} didn't appear.")
             msg = "".join(template).format(sec=timeout, type=type, target=target)
             raise NoSuchElementException(msg)
@@ -357,13 +392,13 @@ class SeleniumWrapper(object):
             selected._iterable = [Select(element) for element in iterable if element.tag_name == 'select']
             return selected
         else:
-            template = ("Wait for elemtent to appear for {sec} seconds, ",
+            template = ("Waited for element to appear for {sec} seconds, ",
                         "but select:{attr} didn't appear.")
             msg = "".join(template).format(sec=timeout, attr=attributes)
             raise NoSuchElementException(msg)
 
-class SeleniumContainerWrapper(object):
 
+class SeleniumContainerWrapper(object):
     def __init__(self, iterable):
         if not isinstance(iterable, collections.Sequence):
             msg = "2nd argument should be an instance of collections.Sequence. given {0}".format(type(iterable))
