@@ -6,3 +6,4 @@ chromedriver.log
 build/
 dist/
 *.egg-info
+.idea
