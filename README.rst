@@ -122,6 +122,11 @@ SeleniumWrapper
         >>> br.timeout
         10
 
+* attr(name)
+    Shortcut to get_attribute::
+
+        >>> br.attr('href')
+
 * click(timeout=3, presleep=0, postsleep=0)
     Continue to polling until timeout or element is displayed and clickable::
 
@@ -141,6 +146,26 @@ SeleniumWrapper
     Execute given javascript::
 
         >>> br.script('alert("hoge")')
+
+* scroll_to(x, y)
+    equivalent to javascript's scrollTo::
+
+        >>> br.scrollTo(0, 100)
+
+* scroll_by(x, y)
+    equivalent to javascript's scrollBy::
+
+        >>> br.scrollBy(10, 10)
+
+* scroll_into_view(jq_identifier, align_with_top=True)
+    find elements by jq_identifier and retrieve its first element and invoke scrollIntoView to it::
+
+        >>> var element = $('#hoge');
+        >>> element && element.scrollIntoView(true)
+
+    second argument is passed as javascript's boolean to scrollIntoView::
+
+        >>> br.scrollIntoView('#hoge', False)
 
 * waitfor(type, target, eager=False, timeout=3)
     See source::
@@ -238,28 +263,34 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.4.0
+    * Added **scroll_to**, **scroll_by**, **scroll_into_view** methods.
+    * Added **jquery** method to support jquery selecter.
+    * Added **load_js**, **script** methods.
+* 0.3.5
+    * Added **attr** method.
+    * Fixed some typos.
 * 0.3.4
-    * Add javascript support(**load_js**, **jquery**, **script** methods). -- *UNSTABLE* --
-    * Add size property to SeleniumContainerWrapper
+    * Added size property to SeleniumContainerWrapper
     * Fixed to be able to change default timeout.
 * 0.3.3
     * Fixed bugs of string formatting.
 * 0.3.2
-    * Change **alert** to wait until Alert's text is accesible.
+    * Changed **alert** to wait until Alert's text is accesible.
     * Override **current_url** to wait for page body loaded.
 * 0.3.1
-    * Add **connect** functon.
+    * Added **connect** functon.
 * 0.3.0
-    * Change **tag** method to **by_tag**.
-    * Add **checkbox**, **radio**.
-    * Change **select** property to method.
-    * Add **sample**, **choice** methods to SeleniumContainerWrapper.
-    * Fix **click** bug.
+    * Changed **tag** method to **by_tag**.
+    * Added **checkbox**, **radio**.
+    * Changed **select** property to method.
+    * Added **sample**, **choice** methods to SeleniumContainerWrapper.
+    * Fixed **click** bug.
 * 0.2.4
-    * Fix bug.
+    * Fixed bug.
 * 0.2.3
-    * Add ext argument to **img** (alt and ext are both optional.)
+    * Added ext argument to **img** (alt and ext are both optional.)
 * 0.2.2
-    * Add new property **alert**
-    * Change **img**'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
-    * Modify SeleniumContainerWrapper's __contains__ behavior to unwrap given object if it is a SeleniumWrapper.
+    * Added new property **alert**
+    * Changed **img**'s argument from ext to alt( find_element_by_xpath("//img[@alt='{}'.format(alt)) )
+    * Modified SeleniumContainerWrapper's __contains__ behavior to unwrap given object if it is a SeleniumWrapper.
