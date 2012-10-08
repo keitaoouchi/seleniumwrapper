@@ -232,6 +232,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.4.1
+    * Fixed some bugs.
 * 0.4.0
     * Added **scroll_to**, **scroll_by**, **scroll_into_view** methods.
 * 0.3.5
