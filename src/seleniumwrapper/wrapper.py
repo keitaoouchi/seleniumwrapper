@@ -86,7 +86,6 @@ def _chainreact(__getattr__):
             def reaction(*realargs):
                 result = methodobj(*realargs)
                 # for side-effective method(append, ...)
-                result = result if result is not None else self
                 return wrap_or_else(result)
 
             return reaction

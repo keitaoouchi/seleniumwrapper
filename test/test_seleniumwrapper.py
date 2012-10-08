@@ -135,6 +135,13 @@ class TestSeleniumWrapper(unittest.TestCase):
         wrapper = SeleniumWrapper(mocked_element)
         self.assertIsInstance(wrapper.unwrap, WebElement)
 
+    def test_execute_script_should_return_None_if_null_was_returned(self):
+        mocked_driver = mock.Mock(WebDriver)
+        mocked_driver.execute_script.return_value = None
+        driver = SeleniumWrapper(mocked_driver)
+        obj = driver.execute_script('return null')
+        self.assertIsNone(obj)
+
 class TestSeleniumWrapperAliases(unittest.TestCase):
 
     def setUp(self):
