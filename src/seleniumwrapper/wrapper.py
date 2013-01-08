@@ -225,9 +225,9 @@ class SeleniumWrapper(object):
             try:
                 if presleep:
                     time.sleep(presleep)
-                self._wait_until_stopping(timeout, 0.1)
-                self._wait_until_displayed(timeout, 0.3)
-                self._wait_until_clickable(timeout, 0.3)
+                self._wait_until_stopping(timeout, 0.01)
+                self._wait_until_displayed(timeout, 0.01)
+                self._wait_until_clickable(timeout, 0.01)
                 if postsleep:
                     time.sleep(postsleep)
             except Exception as e:
