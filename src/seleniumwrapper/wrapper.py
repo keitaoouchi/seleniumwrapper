@@ -6,7 +6,7 @@ import inspect
 import time
 import random
 import selenium
-from selenium.webdriver import Ie, Opera, Chrome, Firefox
+from selenium.webdriver import Ie, Opera, Chrome, Firefox, PhantomJS
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
@@ -23,7 +23,8 @@ def create(drivername, *args, **kwargs):
     drivers = {'ie': Ie,
                'opera': Opera,
                'chrome': Chrome,
-               'firefox': Firefox}
+               'firefox': Firefox,
+               'phantomjs': PhantomJS}
     dname = drivername.lower()
     if dname in drivers:
         try:
@@ -31,7 +32,8 @@ def create(drivername, *args, **kwargs):
         except Exception as e:
             raise e
     else:
-        msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given {0}".format(drivername)
+        msg = "".join(("drivername should be one of [IE, Opera, Chrome, Firefox, PhantomJS]",
+                       "(case-insentive). given {0}".format(drivername)))
         raise ValueError(msg)
 
 
@@ -49,7 +51,8 @@ def connect(drivername, executor, custom_capabilities=None, **kwargs):
                     'opera': DesiredCapabilities.OPERA,
                     'chrome': DesiredCapabilities.CHROME,
                     'firefox': DesiredCapabilities.FIREFOX,
-                    'android': DesiredCapabilities.ANDROID}
+                    'android': DesiredCapabilities.ANDROID,
+                    'phatomjs': DesiredCapabilities.PHANTOMJS}
     dname = drivername.lower()
     if dname in capabilities:
         capability = capabilities[dname]
@@ -62,7 +65,8 @@ def connect(drivername, executor, custom_capabilities=None, **kwargs):
         except Exception as e:
             raise e
     else:
-        msg = "drivername should be one of [IE, Opera, Chrome, Firefox](case-insentive). given {0}".format(drivername)
+        msg = "".join(("drivername should be one of [IE, Opera, Chrome, Firefox]",
+                       "(case-insentive). given {0}".format(drivername)))
         raise ValueError(msg)
 
 
