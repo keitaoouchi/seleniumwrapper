@@ -7,6 +7,7 @@ selenium webdriver wrapper to make manipulation easier.
 Features
 --------
 
+* Support Internet Explorer, Chrome, Opera, Firefox, PhantomJS
 * Support remote webdriver.
 * Easy to type aliases. (find_element_by_xpath => xpath, etc.)
 * Wrapped WebdriverWait( ... ).until( ... ) pattern.
@@ -63,6 +64,7 @@ Each contents in SeleniumContainerWrapper also SeleniumWrapper::
 Basic API
 ---------
 * seleniumwrapper.create(drivername)
+* seleniumwrapper.connect(drivername, executor, custom_capabilities)
     Create webdriver instance and wrap it with SeleniumWrapper.
 
 SeleniumWrapper
