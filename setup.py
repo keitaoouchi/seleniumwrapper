@@ -22,14 +22,14 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules'
 ]
 
-requires = ['selenium>=2.25.0']
+requires = ['selenium>=2.28.0']
 
 setup(
     author='Keita Oouchi',
     author_email='keita.oouchi@gmail.com',
     url = 'https://github.com/keitaoouchi/seleniumwrapper',
     name = 'seleniumwrapper',
-    version = '0.4.1',
+    version = '0.4.2',
     package_dir={"":"src"},
     packages = ['seleniumwrapper'],
     test_suite = "test_seleniumwrapper.suite",
