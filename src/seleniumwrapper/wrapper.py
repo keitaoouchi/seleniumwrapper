@@ -65,7 +65,7 @@ def connect(drivername, executor, custom_capabilities=None, **kwargs):
         except Exception as e:
             raise e
     else:
-        msg = "".join(("drivername should be one of [IE, Opera, Chrome, Firefox]",
+        msg = "".join(("drivername should be one of [IE, Opera, Chrome, Firefox, PhantomJS]",
                        "(case-insentive). given {0}".format(drivername)))
         raise ValueError(msg)
 
@@ -98,6 +98,71 @@ def _chainreact(__getattr__):
 
     return containment
 
+class Performance(object):
+    def __init__(self, performance):
+        if not isinstance(performance, dict):
+            raise AttributeError('Wrapped performance object should be an instance of dict.')
+        self._performance = performance
+
+    @property
+    def memory(self):
+        if 'memory' in self._performance:
+            return Memory(self._performance['memory'])
+        raise AttributeError('window.performance.memory is not supported in this browser.')
+
+    @property
+    def navigation(self):
+        if 'navigation' in self._performance:
+            return Navigation(self._performance['navigation'])
+        raise AttributeError('window.performance.navigation is not supported in this browser.')
+
+    @property
+    def timing(self):
+        if 'timing' in self._performance:
+            return Timing(self._performance['timing'])
+        raise AttributeError('window.performance.timing is not supported in this browser.')
+
+class Memory(object):
+    def __init__(self, memory):
+        self._memory = memory
+
+    def __getattr__(self, name):
+        return self._memory[name]
+
+    @property
+    def __dict__(self):
+        return self._memory
+
+    def __iter__(self):
+        return iter(self._memory)
+
+class Navigation(object):
+    def __init__(self, navigation):
+        self._navigation = navigation
+
+    def __getattr__(self, name):
+        return self._navigation[name]
+
+    @property
+    def __dict__(self):
+        return self._navigation
+
+    def __iter__(self):
+        return iter(self._navigation)
+
+class Timing(object):
+    def __init__(self, timing):
+        self._timing = timing
+
+    def __getattr__(self, name):
+        return self._timing[name]
+
+    @property
+    def __dict__(self):
+        return self._timing
+
+    def __iter__(self):
+        return iter(self._timing)
 
 class SeleniumWrapper(object):
     def __init__(self, driver):
@@ -111,6 +176,24 @@ class SeleniumWrapper(object):
     @property
     def unwrap(self):
         return self._wrapped
+
+    @property
+    def performance(self):
+        if isinstance(self._wrapped, WebDriver):
+            if self._wrapped.execute_script("return 'performance' in window;"):
+                timeout = time.time() + 120
+                script = "return window.performance.timing.loadEventEnd;"
+                executor = self._wrapped.execute_script
+                while time.time() < timeout and not executor(script):
+                    time.sleep(0.2)
+                if not executor(script):
+                    raise Exception('Timeout!')
+                performance = self._wrapped.execute_script('return window.performance;')
+                return Performance(performance)
+            else:
+                raise AttributeError("This browser is not supporting Timing APIs.")
+        else:
+            raise AttributeError("'WebElement' object has not attribute 'performance'")
 
     @property
     def parent(self):
