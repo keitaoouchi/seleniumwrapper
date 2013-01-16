@@ -80,6 +80,15 @@ SeleniumWrapper
 
         >>> price = br.by_tag("th", "Price").parent.by_tag("td").text
 
+* performance
+    Returns window.performance wrapped object::
+
+        >>> performance = br.performance
+        >>> timing = performance.timing
+        >>> navigation = performance.navigation
+        >>> timing.loadEventEnd
+        1358319427476
+
 * to_select
     Convert wrapped WebElement to raw Select object::
 
@@ -234,6 +243,10 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.4.3
+    * Add **perfomance**, **performance.timing**, **performance.navigation**, **performance.memory** properties.
+* 0.4.2
+    * Add 'PhantomJS' support.
 * 0.4.1
     * Fixed some bugs.
 * 0.4.0
