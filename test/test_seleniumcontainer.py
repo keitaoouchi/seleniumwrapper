@@ -27,9 +27,9 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         container = SeleniumContainerWrapper([])
         container.append(1)
         container.append(1)
-        self.assertEquals(container.count(1), 2)
-        self.assertEquals(container.pop(), 1)
-        self.assertEquals(container.count(1), 1)
+        self.assertEqual(container.count(1), 2)
+        self.assertEqual(container.pop(), 1)
+        self.assertEqual(container.count(1), 1)
 
     def test_container_should_return_wrapped_object_if_possible(self):
         mock1 = mock.Mock(WebDriver)

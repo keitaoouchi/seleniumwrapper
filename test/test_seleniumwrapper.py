@@ -56,7 +56,7 @@ class TestSeleniumWrapper(unittest.TestCase):
         mocked_driver = mock.Mock(WebDriver)
         mocked_driver.hoge = lambda d: d
         wrapper = SeleniumWrapper(mocked_driver)
-        self.assertEquals(wrapper.hoge(1), 1)
+        self.assertEqual(wrapper.hoge(1), 1)
 
     def test_wrapper_should_raise_AttributeError_if_wrapped_driver_also_dont_have_attribute_with_given_name(self):
         mocked_driver = mock.Mock(WebDriver)
