@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import collections
 import inspect
 import time
@@ -15,6 +14,7 @@ from selenium.common.exceptions import (NoSuchElementException, TimeoutException
                                         WebDriverException, ElementNotVisibleException,
                                         NoAlertPresentException)
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 
 def create(drivername, *args, **kwargs):
     if not isinstance(drivername, str):
@@ -98,6 +98,7 @@ def _chainreact(__getattr__):
 
     return containment
 
+
 class Performance(object):
     def __init__(self, performance):
         if not isinstance(performance, dict):
@@ -122,6 +123,7 @@ class Performance(object):
             return Timing(self._performance['timing'])
         raise AttributeError('window.performance.timing is not supported in this browser.')
 
+
 class Memory(object):
     def __init__(self, memory):
         self._memory = memory
@@ -135,6 +137,7 @@ class Memory(object):
 
     def __iter__(self):
         return iter(self._memory)
+
 
 class Navigation(object):
     def __init__(self, navigation):
@@ -150,6 +153,7 @@ class Navigation(object):
     def __iter__(self):
         return iter(self._navigation)
 
+
 class Timing(object):
     def __init__(self, timing):
         self._timing = timing
@@ -163,6 +167,7 @@ class Timing(object):
 
     def __iter__(self):
         return iter(self._timing)
+
 
 class SeleniumWrapper(object):
     def __init__(self, driver):
