@@ -16,7 +16,7 @@ Features
 
 How to install
 --------------
-Requires python2.6 or later (exclude python3.x).
+Requires python2.6 or later.
 You need *pip* or *distribute* or *setuptools*::
 
     $ pip install seleniumwrapper
@@ -243,6 +243,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.5.0
+    * Support Python3.
 * 0.4.3
     * Add **perfomance**, **performance.timing**, **performance.navigation**, **performance.memory** properties.
 * 0.4.2
