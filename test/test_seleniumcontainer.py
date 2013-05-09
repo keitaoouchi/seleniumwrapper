@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("./../src")
 if sys.version < '2.7':
     import unittest2 as unittest
@@ -6,13 +7,12 @@ else:
     import unittest
 import collections
 import mock
-import selenium
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwrapper.wrapper import SeleniumWrapper, SeleniumContainerWrapper
 
-class TestSeleniumContainerWrapper(unittest.TestCase):
 
+class TestSeleniumContainerWrapper(unittest.TestCase):
     def test_container_raise_if_given_argument_is_not_an_instance_of_Sequence(self):
         containment = 1
         self.assertNotIsInstance(containment, collections.Sequence)
@@ -104,10 +104,12 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         self.assertTrue(isinstance(picked, SeleniumWrapper))
         self.assertTrue(picked in container)
 
+
 def suite():
     suite = unittest.TestSuite()
     suite.addTests(unittest.makeSuite(TestSeleniumContainerWrapper))
     return suite
+
 
 if __name__ == "__main__":
     s = suite()
