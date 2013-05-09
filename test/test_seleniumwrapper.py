@@ -77,7 +77,7 @@ class TestSeleniumWrapper(unittest.TestCase):
         mocked_driver = mock.Mock(WebDriver)
         mocked_driver.find_element_by_id = lambda target: target
         wrapper = SeleniumWrapper(mocked_driver)
-        self.assertEquals(wrapper.waitfor('id', 'hoge'), 'hoge')
+        self.assertEqual(wrapper.waitfor('id', 'hoge'), 'hoge')
 
     def test_wrapper_should_handle_attr_access_even_if_attr_is_descriptor(self):
         mocked_element = mock.Mock(WebElement)
@@ -96,7 +96,7 @@ class TestSeleniumWrapper(unittest.TestCase):
 
         mocked_driver = Hoge()
         wrapper = SeleniumWrapper(mocked_driver)
-        self.assertEquals(wrapper.num, 100)
+        self.assertEqual(wrapper.num, 100)
         self.assertTrue(isinstance(wrapper.hoge, SeleniumWrapper), wrapper.hoge)
 
     def test_click_should_raise_if_element_is_not_stopping_for_time_seconds(self):

@@ -65,14 +65,14 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2]
         container = SeleniumContainerWrapper(iterable)
-        self.assertEquals(len(container), 2)
+        self.assertEqual(len(container), 2)
 
     def test_container_has_size_property(self):
         mock1 = mock.Mock(WebDriver)
         mock2 = mock.Mock(WebElement)
         iterable = [mock1, mock2]
         container = SeleniumContainerWrapper(iterable)
-        self.assertEquals(container.size, 2)
+        self.assertEqual(container.size, 2)
 
     def test_container_support__contains__protocol(self):
         mock1 = mock.Mock(WebDriver)
@@ -93,7 +93,7 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         container = SeleniumContainerWrapper(iterable)
         sampled = container.sample(5)
         self.assertTrue(isinstance(sampled, SeleniumContainerWrapper))
-        self.assertEquals(len(sampled), 5)
+        self.assertEqual(len(sampled), 5)
         for sample in sampled:
             self.assertTrue(sample in container)
 
