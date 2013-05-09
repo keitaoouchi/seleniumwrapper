@@ -1,6 +1,7 @@
 from setuptools import setup
 
 from sys import version
+
 if version < '2.6.0':
     raise Exception("This module doesn't support any version less than 2.6")
 
@@ -22,7 +23,11 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules'
 ]
 
-requires = ['selenium>=2.28.0']
+requires = ['selenium>=2.32.0']
+tests_requires = ['mock', 'nose']
+
+if version < '2.7.0':
+    tests_requires.append('unittest2')
 
 setup(
     author='Keita Oouchi',
@@ -32,10 +37,11 @@ setup(
     version = '0.4.3',
     package_dir={"":"src"},
     packages = ['seleniumwrapper'],
-    test_suite = "test_seleniumwrapper.suite",
     license='BSD License',
     classifiers=classifiers,
     description = 'selenium webdriver wrapper to make manipulation easier.',
     long_description=long_description,
     install_requires=requires,
+    tests_require=tests_requires,
+    test_suite='test'
 )
