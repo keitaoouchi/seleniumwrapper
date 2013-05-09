@@ -1,4 +1,1 @@
-nose
-mock
-selenium
-unittest2
+selenium>==2.32.0
