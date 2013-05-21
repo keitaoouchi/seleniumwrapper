@@ -96,7 +96,7 @@ SeleniumWrapper
 
     select method returns the same as below::
 
-        >>> br.select(id = 'select_button).select_by_visible_text("hoge")
+        >>> br.select(id = 'select_button').select_by_visible_text("hoge")
 
 * alert
     Returns Alert(switch_to_alert()) object::
