@@ -104,6 +104,14 @@ class TestSeleniumContainerWrapper(unittest.TestCase):
         self.assertTrue(isinstance(picked, SeleniumWrapper))
         self.assertTrue(picked in container)
 
+    def test_contained_object_inherits_option_properties_from_container(self):
+        iterable = [mock.Mock(WebElement) for i in range(5)]
+        container = SeleniumContainerWrapper(iterable, 1, True)
+        for contained in container:
+            self.assertEqual(contained.timeout, 1)
+            self.assertTrue(contained.silent)
+        self.assertEqual(container[-1].timeout, 1)
+        self.assertTrue(container[-1].silent)
 
 def suite():
     suite = unittest.TestSuite()

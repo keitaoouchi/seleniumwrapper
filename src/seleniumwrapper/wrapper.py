@@ -170,10 +170,11 @@ class Timing(object):
 
 
 class SeleniumWrapper(object):
-    def __init__(self, driver):
+    def __init__(self, driver, timeout=5, silent=False):
         if _is_wrappable(driver):
             self._wrapped = driver
-            self._timeout = 5
+            self._timeout = timeout
+            self._silent = silent
         else:
             msg = "2nd argument should be an instance of WebDriver or WebElement. given {0}.".format(type(driver))
             raise TypeError(msg)
@@ -227,15 +228,25 @@ class SeleniumWrapper(object):
         raise NoAlertPresentException(msg)
 
     def _settimeout(self, timeout):
-        if isinstance(timeout, int):
+        if isinstance(timeout, (int, float)):
             self._timeout = timeout
         else:
-            raise AttributeError('int please.')
+            raise AttributeError
 
     def _gettimeout(self):
         return self._timeout
 
     timeout = property(_gettimeout, _settimeout)
+
+    @property
+    def silent(self):
+        return self._silent
+
+    @silent.setter
+    def silent(self, true_of_false):
+        if not isinstance(true_of_false, bool):
+            raise AttributeError
+        self._silent = true_of_false
 
     def __getattribute__(self, name):
         return object.__getattribute__(self, name)
@@ -372,9 +383,9 @@ class SeleniumWrapper(object):
         try:
             result = WebDriverWait(self._wrapped, timeout).until(finder)
             if eager and len(result):
-                return SeleniumContainerWrapper(result)
+                return SeleniumContainerWrapper(result, self.timeout, self.silent)
             elif _is_wrappable(result):
-                return SeleniumWrapper(result)
+                return SeleniumWrapper(result, self.timeout, self.silent)
             else:
                 return result
         except TimeoutException:
@@ -457,11 +468,13 @@ class SeleniumWrapper(object):
 
 
 class SeleniumContainerWrapper(object):
-    def __init__(self, iterable):
+    def __init__(self, iterable, timeout=5, silent=False):
         if not isinstance(iterable, collections.Sequence):
             msg = "2nd argument should be an instance of collections.Sequence. given {0}".format(type(iterable))
             raise TypeError(msg)
         self._iterable = iterable
+        self._timeout = timeout
+        self._silent = silent
 
     @_chainreact
     def __getattr__(self, name):
@@ -471,7 +484,7 @@ class SeleniumContainerWrapper(object):
     def __getitem__(self, key):
         obj = self._iterable[key]
         if _is_wrappable(obj):
-            return SeleniumWrapper(obj)
+            return SeleniumWrapper(obj, self._timeout, self._silent)
         return obj
 
     def __len__(self):
@@ -488,12 +501,12 @@ class SeleniumContainerWrapper(object):
     def sample(self, size):
         picked = random.sample(self._iterable, size)
         if isinstance(picked, collections.Sequence):
-            return SeleniumContainerWrapper(picked)
+            return SeleniumContainerWrapper(picked, self._timeout, self._silent)
         return picked
 
     def choice(self):
         picked = random.choice(self._iterable)
         if _is_wrappable(picked):
-            return SeleniumWrapper(picked)
+            return SeleniumWrapper(picked, self._timeout, self._silent)
         else:
             return picked

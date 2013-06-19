@@ -246,6 +246,25 @@ class TestSeleniumWrapperJavascriptSupport(unittest.TestCase):
                  mock.call.execute_script("try{$('#hoge') && $('#hoge')[0].scrollIntoView(true)}catch(e){}")]
         self.mock.assert_has_calls(calls)
 
+class TestSeleniumWrapperOptions(unittest.TestCase):
+    def setUp(self):
+        mocky = mock.Mock(WebDriver)
+        self.mock = mocky
+
+    def test_timeout_property_allows_int_and_float(self):
+        wrapper = SeleniumWrapper(self.mock)
+        wrapper.timeout = 0.1
+        self.assertEqual(wrapper.timeout, 0.1)
+        wrapper.timeout = 1
+        self.assertEqual(wrapper.timeout, 1)
+
+    def test_silent_property_raise_AttributeError_if_none_bool_given(self):
+        wrapper = SeleniumWrapper(self.mock)
+        try:
+            wrapper.silent = 1
+        except AttributeError:
+            pass
+
 
 def suite():
     suite = unittest.TestSuite()
