@@ -117,6 +117,18 @@ SeleniumWrapper
         >>> br.timeout
         10
 
+* silent
+    Accessor for _silent property.
+
+        # default
+        >>> br.by_id("Hoge")
+        Traceback (most recent call last):
+            ...
+        NoSuchElementException:...
+        >>> br.silent = True
+        >>> br.by_id("Hoge") is None
+        True
+
 * attr(name)
     Shortcut to get_attribute::
 
@@ -243,6 +255,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.5.2
+    * Add silent mode option.
 * 0.5.0
     * Support Python3.
 * 0.4.3
