@@ -109,7 +109,7 @@ SeleniumWrapper
         >>> br.current_url
 
 * timeout
-    Accessor for _timeout property.
+    Accessor for _timeout property::
 
         >>> br.timeout
         5
@@ -118,7 +118,7 @@ SeleniumWrapper
         10
 
 * silent
-    Accessor for _silent property.
+    Accessor for _silent property::
 
         # default
         >>> br.by_id("Hoge")
