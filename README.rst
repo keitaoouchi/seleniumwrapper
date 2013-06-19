@@ -255,6 +255,8 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.5.3
+    * Fix README
 * 0.5.2
     * Add silent mode option.
 * 0.5.0

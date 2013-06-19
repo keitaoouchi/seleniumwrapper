@@ -38,7 +38,7 @@ setup(
     author_email='keita.oouchi@gmail.com',
     url='https://github.com/keitaoouchi/seleniumwrapper',
     name='seleniumwrapper',
-    version='0.5.2',
+    version='0.5.3',
     package_dir={"": "src"},
     packages=['seleniumwrapper'],
     license='BSD License',
