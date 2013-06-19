@@ -16,7 +16,9 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from seleniumwrapper.wrapper import SeleniumWrapper
 from seleniumwrapper.wrapper import SeleniumContainerWrapper
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, ElementNotVisibleException
+from selenium.common.exceptions import (
+    NoSuchElementException,WebDriverException, ElementNotVisibleException, TimeoutException
+)
 
 
 class TestSeleniumWrapperFactory(unittest.TestCase):
@@ -152,6 +154,14 @@ class TestSeleniumWrapper(unittest.TestCase):
         driver = SeleniumWrapper(mocked_driver)
         obj = driver.execute_script('return null')
         self.assertIsNone(obj)
+
+    def test_wrapper_returns_None_in_silent_mode(self):
+        mocked_driver = mock.Mock(WebDriver)
+        mocked_driver.find_element_by_id.side_effect = TimeoutException
+        driver = SeleniumWrapper(mocked_driver)
+        self.assertRaises(NoSuchElementException, driver.by_id, 'hoge')
+        driver.silent = True
+        self.assertIsNone(driver.by_id('hoge'))
 
 
 class TestSeleniumWrapperAliases(unittest.TestCase):

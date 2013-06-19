@@ -389,10 +389,13 @@ class SeleniumWrapper(object):
             else:
                 return result
         except TimeoutException:
-            template = ("Waited for element to appear for {sec} seconds, ",
-                        "but {type}:{target} didn't appear.")
-            msg = "".join(template).format(sec=timeout, type=type, target=target)
-            raise NoSuchElementException(msg)
+            if self.silent:
+                return None
+            else:
+                template = ("Waited for element to appear for {sec} seconds, ",
+                            "but {type}:{target} didn't appear.")
+                msg = "".join(template).format(sec=timeout, type=type, target=target)
+                raise NoSuchElementException(msg)
 
     def xpath(self, target, eager=False, timeout=None):
         return self.waitfor("xpath", target, eager, timeout)
