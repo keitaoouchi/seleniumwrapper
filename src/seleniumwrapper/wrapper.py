@@ -255,11 +255,6 @@ class SeleniumWrapper(object):
     def __getattr__(self, name):
         return self._wrapped, getattr(self._wrapped, name)
 
-    @property
-    def current_url(self):
-        self.by_tag("body", self._timeout)
-        return self._wrapped.current_url
-
     def _is_selectable(self):
         return self.unwrap.tag_name == 'select'
 
