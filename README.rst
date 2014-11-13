@@ -255,6 +255,9 @@ SeleniumContainerWrapper
 
 Recent Change
 -------------
+* 0.5.4
+    * Add support for Python-3.4.
+    * Fix **button** to look for `<button>` tag.
 * 0.5.3
     * Fix README
 * 0.5.2
