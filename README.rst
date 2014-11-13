@@ -215,7 +215,7 @@ SeleniumWrapper
         >>> br.img(alt="I am sorry", ext="sorry.gif")
 
 * button(value, eager=False, timeout=3)
-    find_element_by_xpath("//input[@type='submit' or @type='button' and @value='{}']".format(value), timeout)::
+    find_element_by_xpath("//input[@type='submit' or @type='button' and @value='{0}']|.//button[text()='{0}']".format(value), timeout)::
 
         >>> br.button("Send this form").click()
 
