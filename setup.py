@@ -24,10 +24,11 @@ classifiers = [
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.2',
     'Programming Language :: Python :: 3.3',
+    'Programming Language :: Python :: 3.4',
     'Topic :: Software Development :: Libraries :: Python Modules'
 ]
 
-requires = ['selenium>=2.32.0']
+requires = ['selenium>=2.44.0']
 tests_requires = ['mock', 'nose']
 
 if version < '2.7.0':
