@@ -14,7 +14,7 @@ deploy:
   provider: pypi
   user: Keita
   password:
-    secure: ZsBQBcoveyMfMBOj6yGPNfvRJ+ou7hYecMZJw2J7OPR8nyQwjTwVD3dhyUTdSWYWr9yZeW+PYvvyvuSJzUUgzohWc8yJUM5VwaPdydsniyOiZaIk8eVjZV7ZepAGnUJhLwRodDPcYmLOUoneh9synOKwrtEWH7NTnSM8XYIqlcA=
+    secure: W6gNlzVeURG0rFYbWdwj1iGdM3/d704mUik9AmZncEqiNTJaY+SN1GEzNXD4zUCflUXeLgzsA9b9SlBl+i19gjGhfTHChWRhwQJ95ROgIsOQoo4tl5XuzJ5tQCedLFyO7FLqzrd3X7dFigEXfdDwMMd+vnGCCqug6NDSIKbToew=
   on:
     repo: keitaoouchi/seleniumwrapper
     branch: release/pypi
