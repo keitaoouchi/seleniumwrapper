@@ -18,4 +18,7 @@ deploy:
   on:
     repo: keitaoouchi/seleniumwrapper
     branch: release/pypi
-    distributions: "sdist --formats=gztar,zip"
+    distributions: sdist --formats=gztar,zip
+notifications:
+  slack:
+    secure: mRFzPF4qQzRfHCS9rYEKpUI9w5wvyv4AO8AVuzvwU1rExKokdl6jcxsMEYlOvozqztfjY7YSN3hm/KV60UiPBtbuox54GrvkCu/qqfx6tFRc1aS+5JclGvOGrrRyzodCIDJEuayiZIrzUSMwcwRInd+N1atpJUKoa9AgyVn+e0o=
