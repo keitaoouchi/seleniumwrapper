@@ -22,3 +22,5 @@ deploy:
 notifications:
   slack:
     secure: mRFzPF4qQzRfHCS9rYEKpUI9w5wvyv4AO8AVuzvwU1rExKokdl6jcxsMEYlOvozqztfjY7YSN3hm/KV60UiPBtbuox54GrvkCu/qqfx6tFRc1aS+5JclGvOGrrRyzodCIDJEuayiZIrzUSMwcwRInd+N1atpJUKoa9AgyVn+e0o=
+    on_success: never
+    on_failure: always
