@@ -14,13 +14,15 @@ deploy:
   provider: pypi
   user: Keita
   password:
-    secure: W6gNlzVeURG0rFYbWdwj1iGdM3/d704mUik9AmZncEqiNTJaY+SN1GEzNXD4zUCflUXeLgzsA9b9SlBl+i19gjGhfTHChWRhwQJ95ROgIsOQoo4tl5XuzJ5tQCedLFyO7FLqzrd3X7dFigEXfdDwMMd+vnGCCqug6NDSIKbToew=
+    secure: d5aCVLkhV/uh+/Mr/c398KmA3DVgx6TAO9HYAsDiLbzh1JQO4jsOEQ4TSrosFV2dlolDuLaXu6tHzzeoUKg8BO2wF9pTwbhoo21+Xr5CHd3bAx4WTPvC8POEByVur8sJC1lD45VR0A2sPJMppi9778dgIZpvowE8sANlvv3iztU=
   on:
     repo: keitaoouchi/seleniumwrapper
     branch: release/pypi
     distributions: sdist --formats=gztar,zip
+    python: 3.4
+  allow_failure: false
 notifications:
   slack:
     secure: mRFzPF4qQzRfHCS9rYEKpUI9w5wvyv4AO8AVuzvwU1rExKokdl6jcxsMEYlOvozqztfjY7YSN3hm/KV60UiPBtbuox54GrvkCu/qqfx6tFRc1aS+5JclGvOGrrRyzodCIDJEuayiZIrzUSMwcwRInd+N1atpJUKoa9AgyVn+e0o=
-    on_success: never
-    on_failure: always
+    on_success: change
+    on_failure: change
