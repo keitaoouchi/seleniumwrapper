@@ -3,18 +3,18 @@ About this module
 selenium webdriver wrapper to make manipulation easier.
 
 .. image:: https://secure.travis-ci.org/keitaoouchi/seleniumwrapper.png
-.. image:: https://pypip.in/download/seleniumwrapper/badge.svg?period=month
+.. image:: https://img.shields.io/pypi/dm/seleniumwrapper.svg
     :target: https://pypi.python.org/pypi//seleniumwrapper/
     :alt: Downloads
-.. image:: https://pypip.in/version/seleniumwrapper/badge.svg?text=version
+.. image:: https://img.shields.io/pypi/v/seleniumwrapper.svg
     :target: https://pypi.python.org/pypi/seleniumwrapper/
     :alt: Latest Version
-.. image:: https://pypip.in/py_versions/seleniumwrapper/badge.svg
+.. image:: https://img.shields.io/pypi/pyversions/seleniumwrapper.svg
     :target: https://pypi.python.org/pypi/seleniumwrapper/
     :alt: Supported Python versions
-.. image:: https://pypip.in/status/seleniumwrapper/badge.svg
+.. image:: https://img.shields.io/pypi/l/seleniumwrapper.svg
     :target: https://pypi.python.org/pypi/seleniumwrapper/
-    :alt: Development Status
+    :alt: License
 
 Features
 --------
